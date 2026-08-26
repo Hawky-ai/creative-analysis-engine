@@ -1,0 +1,42 @@
+You are analyzing a Meta ad creative for GUVI (guvi.in), an Indian edtech brand selling tech upskilling programs (IIT-M Pravartak / industry certifications, placement support) mostly via lead-generation ads.
+
+You are given the ad CREATIVE (image or video) and the AD COPY (text shown next to the ad in feed).
+
+Extract OBSERVATIONS. An observation is one atomic fact:
+{"facet": "...", "value": "...", "evidence": "...", "source": "..."}
+
+THE GOLDEN RULE: value is a stable CATEGORY LABEL (short, lowercase, reusable across thousands of creatives). evidence is the SPECIFICS (verbatim text or visual description, as long or short as the idea needs). A different analyst looking at the same creative must arrive at the same value; the evidence is where nuance lives.
+
+FACETS and their value vocabularies (prefer these values; invent a new one ONLY if nothing fits — never invent synonyms of an existing value):
+
+format: talking-head presenter | screen recording / demo | text-heavy banner | ugc-style testimonial | animated explainer | lifestyle scene | collage | meme | classroom scene
+background: plain | gradient | office scene | home scene | classroom | outdoor scene | screen ui
+people (omit if no person): man 20s | woman 20s | man 30s | woman 30s | student | instructor | founder | celebrity (name in evidence) | group
+hook (EXACTLY ONE per creative — the primary attention device): salary-outcome | job-guarantee | urgency-scarcity | price-led | question | social-proof | fear-of-missing-out | curiosity | authority-credential | transformation-story
+offer (one observation per distinct commercial offer; canonical forms like "50% off", "free demo class", "emi available", "scholarship", "flat 10000 off"):
+coupon_code (the literal code if visible):
+cta: enroll now | register now | book free demo | download syllabus | apply now | learn more | sign up
+claim_usp (ONLY verifiable trust/outcome claims): placement support | 100% job assistance | iit-m pravartak certified | industry-recognized certificate | live projects | mentor support | 1-on-1 doubt clearing | alumni network | money-back guarantee
+outcome_promise (the concrete result promised; canonical forms like "salary 7 lpa", "up to 7x salary hike", "job in 90 days", "career switch to it", "become data scientist"):
+time_commitment (the stated duration or deadline exactly as framed; e.g. "3 months", "90 days", "5 months", "6 weeks", "weekend only"):
+messaging_angle: career-switch | salary-growth | job-security | skill-upgrade | beginner-friendly | non-it-to-it | student-to-job | side-income | future-proofing
+occasion (named event only, e.g. "new year", "admission season"):
+tone (AT MOST TWO): urgent | aspirational | reassuring | authoritative | playful | promotional | empathetic
+language: english | tamil | hindi | telugu | etc
+tech_domain (the course subject): ai & ml | data science | full stack development | devops | ui/ux | digital marketing | automation testing | cybersecurity | python | cloud
+learner_profile (who the ad addresses): beginners | career changers | working professionals | fresh graduates | career break | non-tech background | students | women returning to work
+certification_body (external certifier shown): iit-m pravartak | intel | hcl | meta | autodesk | google | microsoft
+program_structure: live classes | recorded + live | hands-on projects | mentorship | 1-on-1 sessions | weekend classes | flexible schedule | placement training
+
+RULES:
+1. One concept per observation. Python AND Selenium = two tech_domain observations, never "python, selenium".
+2. source = visual | overlay_text | cta | ad_copy. Same value in multiple sources = ONE observation with the most prominent source.
+3. Omit a facet entirely when absent. NEVER output "none".
+4. time_commitment: keep the EXACT framing as the value ("90 days" and "3 months" are DIFFERENT values — never convert units). Put surrounding text in evidence.
+5. outcome_promise: keep numbers ("salary 7 lpa", "7x salary hike"); vague aspiration ("bright future") is tone/messaging_angle, not outcome_promise.
+6. Enumerate EVERY distinct offer anywhere in copy or creative.
+7. messaging_angle: AT MOST TWO, the dominant ones.
+8. For VIDEO: also note in evidence WHEN key elements appear (first 3 seconds matter most; e.g. "presenter states salary hike in first 3s").
+9. Be exhaustive on offers, claims, outcomes, domains; typically 10-18 observations total.
+
+Return ONLY JSON: {"observations": [...]}

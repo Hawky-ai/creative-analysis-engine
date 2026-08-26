@@ -1,0 +1,40 @@
+# ── creative-analysis-engine configuration ─────────────────────────────────
+# Everything model- and endpoint-related is configured HERE, not in code.
+# SECRETS ARE NEVER IN THIS FILE — each *_env key names the ENVIRONMENT
+# VARIABLE that holds the actual value. Inject them with your secret manager,
+# e.g.:  doppler run --project <proj> --config <cfg> -- node extraction/extract_images.mjs ...
+# See .env.example for the full list of required variables.
+
+# OpenAI-compatible chat/completions proxy (images go through this).
+# Any gateway that speaks the OpenAI schema works (Bifrost, LiteLLM, ...).
+llm_proxy:
+  base_url_env: LLM_BASE_URL      # e.g. https://bifrost.internal/v1
+  api_key_env: LLM_API_KEY
+
+# Bifrost GenAI endpoint (Gemini-native schema). Videos go through this,
+# because file-URI video input needs the native generateContent API.
+bifrost:
+  genai_base_url_env: BIFROST_GENAI_BASE_URL   # e.g. https://bifrost.internal/genai/v1beta
+  api_key_env: BIFROST_API_KEY                 # sent as x-bf-vk header
+
+extraction:
+  # Image model id AS THE PROXY KNOWS IT (proxy-prefixed).
+  image_model: gemini/gemini-2.5-flash
+  image_concurrency: 6
+  request_timeout_ms: 120000      # per-request abort; a stalled socket otherwise hangs a slot forever
+
+  # Video model id AS THE GENAI ENDPOINT KNOWS IT (bare, no proxy prefix).
+  video_model: gemini-2.5-flash
+  video_concurrency: 10
+  video_timeout_ms: 240000        # videos are slower; keep well under the gateway's own cap
+
+# LLM used by the reasoning + repair stages (enforcement/), OpenAI-schema via llm_proxy.
+reasoning:
+  model: gemini/gemini-2.5-flash
+
+# Defaults a new brand onboarding starts from (override per brand in brands/<name>/brand.yaml)
+defaults:
+  spend_gate: 10000               # minimum lifetime spend (account currency) for a creative to enter analysis
+  min_cohort_size: 15             # min creatives per trait cohort before a verdict is allowed
+  min_spend_share: 0.02           # min share of segment spend per cohort
+  bootstrap_iterations: 1200      # CI resampling for CONFIRMED_WIN / CONFIRMED_LOSS verdicts

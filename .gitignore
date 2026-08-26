@@ -1,0 +1,8 @@
+.env
+brands/*
+!brands/example/
+*.progress.jsonl
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store

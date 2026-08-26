@@ -1,0 +1,81 @@
+You are analyzing a VIDEO ad for a mobile app-install campaign. The app is an anonymous 1-on-1 voice/video-calling platform (users — mostly men — buy coins to talk with verified hosts — mostly women — in their own language; hosts earn per minute). Two kinds of ads run from this account: ads recruiting PAYING USERS ("talk to new people") and ads recruiting HOSTS ("earn money by talking"). The ads are short vertical videos in Indian languages: a presenter talking to camera, simulated video-calls, slice-of-life scenes, or app demos. The presenter typically represents the kind of person the viewer could talk to — treat who they are and how they address the viewer as central creative variables. Watch the ENTIRE video including audio before extracting.
+
+Extract OBSERVATIONS. An observation is one atomic fact:
+{"facet": "...", "value": "...", "evidence": "...", "source": "..."}
+
+THE GOLDEN RULE: value is a stable CATEGORY LABEL or a short CONCRETE phrase (lowercase, reusable across hundreds of videos). evidence carries the specifics — verbatim words (original language + English translation when not English), WHEN it happens ("at 0-3s", "at 12s", "throughout"), and precise visual description. A different analyst watching the same video must arrive at the same value.
+
+source is one of: spoken (said aloud) | subtitle (burned-in caption text) | on-screen-ui (app interface elements, badges, buttons rendered over the video) | visual (what is physically seen in the scene).
+
+────────────────────────────────────────
+CORE FACETS — emit ALL of these for EVERY video, exactly once each (this fixed backbone is what makes videos comparable; if one is genuinely undeterminable, emit it with value "unclear" and say why in evidence — never silently skip a core facet):
+
+format (the video's fundamental structure — exactly one):
+simulated-video-call (screen looks like an ongoing video call: call UI chrome, end-call button, picture-in-picture of the other person) | talk-to-camera (presenter speaks directly to viewer, selfie or tripod style) | mirror-selfie (presenter films themselves in a mirror holding the phone) | skit-dialogue (two or more characters acting a scene) | slice-of-life (presenter does a daily activity — cooking, dishes, walking — while talking) | app-demo (screen recording or heavy app-interface focus) | montage (cuts between multiple scenes/people with no single continuous presenter)
+
+presenter_gender: female | male | multiple | none
+
+presenter_age_band (visual estimate of the main presenter): late-teens-20s | 30s | 40s-plus | mixed | none
+
+presenter_attire (main presenter's clothing style): western-casual (tshirt/top/jeans) | ethnic-saree | ethnic-kurta-salwar | professional-formal | sleepwear-homewear | none
+
+setting (where the video takes place; for simulated-video-call format, describe the MAIN presenter's visible background room): bedroom | kitchen | living-room | office | classroom | outdoor | vehicle | plain-studio | multiple | unclear
+
+language_spoken (the language actually spoken in audio): hindi | tamil | telugu | kannada | malayalam | bengali | odia | marathi | gujarati | english | none-music-only | (other — name it)
+
+subtitle_script (how burned-in captions are written — a testable creative choice, separate from which language): native-script (the language's own script) | romanized (the language written in latin letters) | english | mixed | none
+
+hook (EXACTLY ONE — the attention device of the FIRST 3 SECONDS; put the verbatim opening line with translation and timing in evidence):
+question-to-viewer ("do you also have an iPhone?") | bold-claim ("at 35, the energy of 25") | emotional-moment (crying, laughing, dancing already in progress) | activity-in-progress (mid-task when video opens) | incoming-call (video opens as a call connecting/ringing) | direct-greeting (presenter greets viewer) | curiosity-tease | (other — name it concretely)
+
+production_style: raw-ugc (handheld, natural light, unpolished — deliberately amateur) | polished-ugc (ugc format but visibly produced: stable frame, good light) | staged-professional (set design, professional grade) | ai-generated-look (visibly synthetic or carries an AI label)
+
+ai_content_label: yes (a visible "AI Generated Content" / "AI-Generated" tag appears) | no
+
+ad_objective_type (which side of the marketplace this ad recruits — exactly one): user-acquisition (invites the viewer to install and TALK to people) | host-recruitment (invites the viewer to install and EARN money by taking calls) | unclear
+
+address_mode (how the presenter relates to the viewer — exactly one): first-person-invitation (presenter offers HERSELF/HIMSELF as the person to talk to: "you can call me", "talk to me without hesitation") | app-endorsement (presenter describes the app and its users in third person: "you can talk to new people on this app") | testimonial-experience (presenter narrates their own experience as a user: "I made friends here") | dramatized-scene (the ad shows a call/story happening rather than anyone pitching)
+
+scene_description (a 2-4 sentence factual description of what happens in the video from start to end — who, where, what they do, what changes; this is the human-readable context every later analysis reads alongside the facets. Put the full description in the value field; leave evidence as an empty string for this facet.)
+
+────────────────────────────────────────
+OPTIONAL FACETS — emit only when genuinely present (omit entirely when absent, never write "none"):
+
+value_prop (one observation per DISTINCT selling point communicated — spoken, subtitled, or shown; value is the CONCRETE proposition in a short reusable phrase, never an abstract category): e.g. "no phone number needed" | "chat in your own language" | "real people, verified" | "safe private chat" | "end-to-end encrypted" | "talk to new people" | "video call strangers" | "works on iphone" | (use the actual proposition; evidence = verbatim words + translation + timing)
+
+persona_archetype (the IDENTIFIABLE ROLE the presenter plays — a character with an occupation or life-situation the video establishes through setting, activity, or dialogue: washing dishes at home = housewife, at an office desk = working-professional. Emit ONLY when a genuine role is identifiable; NEVER emit generic values like "young-woman"/"young-man" — gender and age are already covered by the presenter_* core facets. Omit entirely when the presenter is just a person talking with no established role): college-student | housewife | working-professional | professor-teacher | mature-woman | (other role — name it)
+
+app_ui_shown (one observation per distinct app-interface element visible): call-interface-chrome | encrypted-badge | app-screenshot | emoji-sticker-overlay | chat-bubbles | install-button | app-logo
+
+subtitle_style (the visual design of captions — a design-brief detail): describe as color + shape, e.g. "yellow highlight bar" | "black bar white text" | "pink pill" | "plain white floating"
+
+cta (each distinct call-to-action with WHERE it appears — spoken, subtitle, end-card — and timing in evidence): install now | download the app | try it today | link in bio | (exact wording in evidence)
+
+emotional_register (AT MOST TWO — the dominant emotional tones): playful | reassuring | sincere | energetic | melancholic-then-relieved | confident | flirtatious
+
+emotional_driver (the viewer NEED the ad speaks to, when identifiable — AT MOST TWO; put the exact line that reveals it in evidence): loneliness-companionship | boredom-timepass | homesickness-expat (missing home/language while abroad) | stress-relief-unburdening (talk about what you can't tell others) | flirtation-romance | social-anxiety-ease (talk without hesitation/judgment) | income-need (for host-recruitment ads)
+
+social_proof (any user count, rating, or popularity claim): exact claim in value, e.g. "1 crore downloads"
+
+offer (any ACTUAL incentive — free download, free coins, free trial, discount): concrete offer as value. An affordability comparison is NOT an offer — see price_metaphor.
+
+price_metaphor (a colloquial cheapness comparison for the app's cost — a recurring device in these ads: "costs as much as a packet of pickle", "at the price of one egg", "a candy's worth of money", "₹10 in your pocket is enough". Emit one observation with the concrete metaphor as the value, e.g. "price of one egg"; verbatim line + translation + timing in evidence): concrete comparison as value
+
+device_targeting_signal (an explicit device reference — "do you have an iPhone", android mention): concrete reference as value
+
+end_card (what the final 1-2 seconds show, when there is a distinct closing frame: app logo, install button, phone mockup): describe concretely
+
+────────────────────────────────────────
+RULES:
+1. One concept per observation. Two value props = two observations, never merged.
+2. TIMING is mandatory in evidence for hook, cta, and any value_prop — say when it happens ("at 0-2s", "at 14s", "final 2s").
+3. Verbatim quotes: give the original language AND an English translation in evidence.
+4. Values must be concrete enough to be meaningful alone — "no phone number needed" not "privacy claim". The category-style facets (format, hook, production_style) are already concrete categories; free facets (value_prop, offer, social_proof) must carry the actual content.
+5. presenter_* facets describe the MAIN presenter (most screen time). A simulated-call's picture-in-picture caller is not the main presenter — note them in scene_description instead.
+6. Distinguish what is SPOKEN from what is SUBTITLED from what is UI — the source field carries this; when the same message appears in multiple sources, one observation with the most prominent source and note the others in evidence.
+7. Never speculate about content you could not see or hear — if audio is silent or music-only, say so via language_spoken and do not invent spoken lines.
+8. Keep every description objective and factual (age band, attire, setting) — no attractiveness judgments, no assumptions about the presenter beyond what is visible.
+9. Do not extract platform chrome (the "AD" placement label) — but DO extract a visible "AI Generated Content" tag via ai_content_label, and in-app UI elements via app_ui_shown, since the advertiser chose those.
+10. Typical output: 11 core + 3-8 optional = 14-19 observations per video.
+
+Return ONLY JSON: {"observations": [...]}

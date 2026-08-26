@@ -1,0 +1,8 @@
+# Per-brand configuration. Copy this directory to brands/<name>/ and fill in.
+brand_id: ""              # warehouse brand id (24-hex ObjectId in our stack)
+vertical: retail-media-banner   # which prompts/<vertical>.txt to use
+platform: meta            # meta | google | external-channel name
+kpi: leads                # conversions field in inventory.jsonl (leads | demo_sched | installs | purchases)
+spend_gate: 10000         # min lifetime spend per creative to enter analysis
+media: [image, video]
+notes: ""                 # KPI quirks, hash availability, name conventions — anything discovery found
