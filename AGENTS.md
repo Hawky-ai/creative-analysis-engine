@@ -123,8 +123,25 @@ see `explorers/`), collect feedback, fold it into the prompt (yes, this loops ba
 step 3). When approved, load entities for downstream consumers:
 ```
 doppler run ... -- python3 loaders/load_entities_ch.py brands/<name>/raw/obs.json <brand_id> \
-    [--aliases prompts/aliases/<vertical>.json]
+    --aliases prompts/aliases/<vertical>.json --timeline brands/<name>/raw/tl.json
 ```
+Writes one row per hash: scalar facets as strings, multi-value facets as arrays,
+`_observations` (verbatim evidence) and `_timeline` (beats) as payload keys.
+
+### 9. Wire the brand into Copilot (three steps, all brand-scoped — other brands untouched)
+Copilot's group-by / ranking paths explode array-valued attributes (copilot PR
+`creative-entities-v2`); `view` returns the full row including `_observations`/`_timeline`.
+1. **Register the facets** so the agent knows they exist — Copilot reads attribute names
+   from the brand's Mongo `metrics.tags` doc, nothing else:
+   `MONGO_URI=... python3 loaders/set_copilot_entities.py <brand_id> prompts/facets/<vertical>.json --media video`
+   Keep `prompts/facets/<vertical>.json` in sync with the prompt (one-line meaning per facet).
+2. **Install the brand skill** — upload `copilot/skills/creative_entities_analysis.md` to the
+   brand's vault at `skills/` (`POST /api/v1/vault/<brand_id>/upload`, `folder_path=skills`).
+   Brand-authored skills are listed in the system prompt under "This brand's own skills"
+   and take precedence over the shipped FLOW B for that brand only.
+3. Smoke-test with 3 questions: a group-by on a multi-value facet (`value_prop`), an
+   evidence question ("show me the line where the presenter says…"), and a
+   within-language comparison. All three must succeed before handing over.
 
 ## Known pitfalls (all previously hit — don't rediscover them)
 
