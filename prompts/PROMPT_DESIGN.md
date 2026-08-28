@@ -65,8 +65,18 @@ One observation = one atomic fact:
     platform, brand list, or vertical assumptions — the same prompt structure must
     survive a brand switch. The model may invent a new value when nothing fits (it once
     correctly invented "formulation claim" for "Ayurvedic Proprietary Medicine").
-12. **Objectivity constraints for people.** Age band, attire, setting — visual facts
-    only; no attractiveness judgments, nothing beyond what is visible.
+12. **Objectivity constraints for people.** Casting attributes (age band, attire, hair,
+    skin tone) are recorded as neutral, visible, FIXED-SCALE descriptors, because casting
+    is a real creative decision the brand makes. Use a published scale where one exists
+    (skin tone → Monk Skin Tone bands) and put the scale reference in EVIDENCE, never in
+    the value — otherwise "medium-light" and "medium-light (MST 3-4)" split the same
+    cohort in two. Never infer ethnicity, caste, religion, region-of-origin or class from
+    appearance; never make attractiveness judgments; emit "unclear" when lighting or
+    filtering genuinely prevents a call rather than guessing.
+13. **A `FOCUS:` block makes listed attributes mandatory.** Prompts support an appended
+    focus brief (see `brands/example/focus.md`) so a brand team can pin extra required
+    attributes without a prompt rewrite. Agree it BEFORE the first run — a review round
+    that discovers a missing attribute costs a full re-extraction.
 
 ## The iteration loop (never skip)
 

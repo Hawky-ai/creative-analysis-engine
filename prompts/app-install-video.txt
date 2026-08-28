@@ -19,6 +19,11 @@ presenter_age_band (visual estimate of the main presenter): late-teens-20s | 30s
 
 presenter_attire (main presenter's clothing style): western-casual (tshirt/top/jeans) | ethnic-saree | ethnic-kurta-salwar | professional-formal | sleepwear-homewear | none
 
+presenter_skin_tone (the main presenter's apparent skin tone, as a CASTING/REPRESENTATION attribute — banded on the Monk Skin Tone scale so the label is reproducible; report what is visible on screen, and note in evidence when lighting, filters, or colour grading make it uncertain). The value must be EXACTLY ONE of these bare labels with NOTHING appended — put the MST number and the lighting note in evidence, never in the value: light | medium-light | medium | medium-deep | deep | unclear | none
+   (band reference for your own judgement, do not write it into the value: light = MST 1-2, medium-light = MST 3-4, medium = MST 5-6, medium-deep = MST 7-8, deep = MST 9-10; "unclear" when heavy filter/backlight/grading prevents a call; "none" when no person is on screen)
+
+presenter_hair (the main presenter's visible hair styling — a directly reproducible casting/styling choice): long-open | long-tied | short | braided | covered | none
+
 setting (where the video takes place; for simulated-video-call format, describe the MAIN presenter's visible background room): bedroom | kitchen | living-room | office | classroom | outdoor | vehicle | plain-studio | multiple | unclear
 
 language_spoken (the language actually spoken in audio): hindi | tamil | telugu | kannada | malayalam | bengali | odia | marathi | gujarati | english | none-music-only | (other — name it)
@@ -66,6 +71,8 @@ device_targeting_signal (an explicit device reference — "do you have an iPhone
 end_card (what the final 1-2 seconds show, when there is a distinct closing frame: app logo, install button, phone mockup): describe concretely
 
 ────────────────────────────────────────
+FOCUS BRIEF (optional): if a "FOCUS:" block is appended below this prompt, it lists the attributes this brand's team most wants captured. Treat every item in it as REQUIRED for this run — emit it even when the value is unremarkable, and be extra literal in its evidence.
+
 RULES:
 1. One concept per observation. Two value props = two observations, never merged.
 2. TIMING is mandatory in evidence for hook, cta, and any value_prop — say when it happens ("at 0-2s", "at 14s", "final 2s").
@@ -74,7 +81,7 @@ RULES:
 5. presenter_* facets describe the MAIN presenter (most screen time). A simulated-call's picture-in-picture caller is not the main presenter — note them in scene_description instead.
 6. Distinguish what is SPOKEN from what is SUBTITLED from what is UI — the source field carries this; when the same message appears in multiple sources, one observation with the most prominent source and note the others in evidence.
 7. Never speculate about content you could not see or hear — if audio is silent or music-only, say so via language_spoken and do not invent spoken lines.
-8. Keep every description objective and factual (age band, attire, setting) — no attractiveness judgments, no assumptions about the presenter beyond what is visible.
+8. Keep every description objective and factual (age band, attire, skin tone, hair, setting) — descriptive only. NEVER make attractiveness or desirability judgments, never infer ethnicity, caste, religion, region-of-origin, or class from appearance, and never speculate about anything not directly visible. Skin tone is recorded as a neutral casting attribute on a fixed scale, exactly like attire or hair — if lighting or filtering makes it genuinely unclear, say "unclear" rather than guessing.
 9. Do not extract platform chrome (the "AD" placement label) — but DO extract a visible "AI Generated Content" tag via ai_content_label, and in-app UI elements via app_ui_shown, since the advertiser chose those.
 10. Typical output: 11 core + 3-8 optional = 14-19 observations per video.
 

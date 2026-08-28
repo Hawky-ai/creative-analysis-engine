@@ -24,6 +24,7 @@ Read `README.md` for what the system is; read this for how to drive it.
 ```
 brands/<name>/
   brand.yaml          # copy from brands/example/brand.yaml, fill in
+  focus.md            # copy from brands/example/focus.md — what the team wants captured (step 2b)
   raw/                # inventories, observations, canonical
   results/            # analysis outputs
 ```
@@ -43,6 +44,17 @@ persuasion levers, and they belong in the prompt preamble.
 One JSONL row per unique creative: `{"hash", "u" (media url), "ad_copy" (json string),
 "spend", ...metrics}`. Dedupe by media URL. Gate by spend (default ≥ the
 `defaults.spend_gate` in config.yaml) — cover ~95%+ of spend with the fewest creatives.
+
+### 2b. Agree the FOCUS BRIEF with the brand team (do not skip)
+Before writing the prompt, ask what the team actually wants to learn from their
+creatives — the decisions they'll make, the attributes they already track by hand, the
+arguments they can't settle, and anything they must not infer. Record it in
+`brands/<name>/focus.md` and append it to the prompt as a `FOCUS:` block; the prompt
+treats those attributes as REQUIRED for every creative.
+
+*Why this is its own step: a review round once flagged a missing casting attribute that
+nobody had asked about upfront — an entire extraction pass had to be re-run. Eliciting
+focus costs one conversation; discovering it costs a re-run.*
 
 ### 3. Design the extraction prompt
 Follow `prompts/PROMPT_DESIGN.md` — the iteration loop there is mandatory, especially:
