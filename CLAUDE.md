@@ -74,6 +74,21 @@ doppler run ... -- node extraction/extract_videos.mjs brands/<name>/raw/videos.j
 Verify: 0 errors, average observations/creative in the prompt's stated range, facet
 coverage table looks sane (core facets ≈ 100%).
 
+### 4b. Video beat timeline (separate call — do NOT bundle with entities)
+```
+doppler run ... -- node extraction/extract_timeline_vid.mjs videos.jsonl tl.json prompts/<vertical>-timeline.txt
+python3 analysis/timeline_analysis.py     # joins beats to Meta's video_p25/p50/p75/p100 quartiles
+```
+Returns `{duration, beats:[{t0,t1,role,says,says_en,text,text_en,shows}]}` — a contiguous
+0→end breakdown with a fixed `role` vocabulary (hook/problem/introduce-app/value-prop/demo/
+social-proof/price/objection-handling/invitation/cta/end-card). The runner validates
+contiguity + t0=0 and retries on failure.
+
+*Keep it a separate LLM call.* Bundling timeline into the entity prompt degraded both and cost
+5x the prompt tokens (21.9k vs 4.6k); split, it ran 100/100 clean.
+*JSON safety:* translations go in dedicated `says_en`/`text_en` fields — a parenthesised
+translation inside `says` produces unescaped quotes that break the whole array.
+
 ### 5. Canonicalize
 Merge obs files, lowercase/strip values, then (optional but recommended at scale) run a
 dictionary pass to merge synonyms and roll values into concepts. Keep per-facet calls
@@ -124,3 +139,10 @@ doppler run ... -- python3 loaders/load_entities_ch.py brands/<name>/raw/obs.jso
   edges inclusively.
 - Two offers on one banner: the louder one suppresses the other unless the prompt
   explicitly demands ALL distinct offers.
+- Video retention: `video_play_actions` counts feed AUTOPLAY starts (scroll-pasts included),
+  so any ratio against it looks catastrophic and means little. Compare p25→p50→p75→p100
+  against each other, never against plays.
+- ALWAYS run a within-language (or within-segment) cut before reporting a pooled creative
+  finding. A real example: "ask lands early = ₹48 vs ₹76 CPI" pooled, but within language it
+  REVERSED in 4 of 5 languages — pure Simpson's paradox from language mix. Pooled cuts across
+  a multi-language account are confounded by auction price differences per language.

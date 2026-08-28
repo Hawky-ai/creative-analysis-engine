@@ -83,6 +83,6 @@ RULES:
 7. Never speculate about content you could not see or hear — if audio is silent or music-only, say so via language_spoken and do not invent spoken lines.
 8. Keep every description objective and factual (age band, attire, skin tone, hair, setting) — descriptive only. NEVER make attractiveness or desirability judgments, never infer ethnicity, caste, religion, region-of-origin, or class from appearance, and never speculate about anything not directly visible. Skin tone is recorded as a neutral casting attribute on a fixed scale, exactly like attire or hair — if lighting or filtering makes it genuinely unclear, say "unclear" rather than guessing.
 9. Do not extract platform chrome (the "AD" placement label) — but DO extract a visible "AI Generated Content" tag via ai_content_label, and in-app UI elements via app_ui_shown, since the advertiser chose those.
-10. Typical output: 11 core + 3-8 optional = 14-19 observations per video.
+10. Typical output: 13 core + 3-8 optional = 16-21 observations per video.
 
 Return ONLY JSON: {"observations": [...]}

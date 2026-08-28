@@ -1,0 +1,42 @@
+You are analyzing a VIDEO ad for a mobile app-install campaign (an anonymous 1-on-1 voice/video-calling app; users buy coins to talk with hosts in their own language). Your ONLY job is to produce the video's BEAT TIMELINE — a beat-by-beat structural breakdown from 0s to the end.
+
+Watch the ENTIRE video including audio. Then return the timeline as JSON.
+
+Return ONLY: {"duration": <total seconds, number>, "beats": [ ... ]}
+
+Each beat is an object:
+{"t0": <start seconds, number>, "t1": <end seconds, number>, "role": "<beat role>",
+ "says": "<verbatim spoken line, ORIGINAL LANGUAGE ONLY>",
+ "says_en": "<English translation of says>",
+ "text": "<burned-in on-screen caption text, verbatim, ORIGINAL LANGUAGE ONLY>",
+ "text_en": "<English translation of text>",
+ "shows": "<what is visually happening, one factual sentence>"}
+
+BEAT ROLE — use EXACTLY one per beat. This fixed vocabulary is what makes videos comparable:
+hook (the opening attention device) | problem (a pain, frustration, or need being named) |
+introduce-app (the app or its name first presented) | value-prop (a specific benefit explained) |
+demo (the app interface or a call shown working) | social-proof (users, ratings, popularity claims) |
+price (cost, coins, or an affordability comparison) | objection-handling (privacy, safety, billing fears addressed) |
+invitation (presenter personally invites the viewer to talk/connect with THEM) |
+cta (explicit instruction to install/download/click) | end-card (closing logo or app-store frame, no narration)
+
+RULES:
+1. Beats are SEGMENTED BY WHAT CHANGES — a new message, a new scene, a new role. Not fixed intervals.
+   A 15s video typically has 3-6 beats; a 60s+ video 6-12.
+2. COVERAGE: the first beat starts at t0=0; the last beat's t1 equals the video duration. Consecutive
+   beats must touch exactly — beat[i].t1 == beat[i+1].t0. No gaps, no overlaps, nothing uncovered.
+3. TIMING ACCURACY MATTERS MOST. These timestamps get compared against viewer drop-off curves
+   (25%/50%/75%/100% watch points), so an inaccurate boundary is worse than a coarse one. Place each
+   boundary where the change actually happens.
+4. "says"/"text" carry the ORIGINAL language only; their translations go in "says_en"/"text_en".
+   Empty strings when nothing is spoken or no caption is on screen.
+5. JSON SAFETY: no field may contain a raw double-quote character. Never put a parenthesised
+   translation or a quoted phrase inside "says"/"text" — that is what the _en fields are for. If a
+   spoken line contains quotation marks, drop them.
+6. "shows" is one factual sentence about the visual action. Never speculate about intent or effect.
+7. Be objective about people on screen — describe only what is visible; no attractiveness judgments,
+   and never infer ethnicity, caste, religion, or class.
+8. If the video has no spoken audio, still produce the timeline from visuals and captions, and set
+   says/says_en to empty strings.
+
+Return ONLY the JSON object described above, nothing else.
