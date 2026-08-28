@@ -6,6 +6,9 @@ Copilot derives a brand's attribute names from its Mongo `metrics` doc:
 Nothing else tells the agent that a facet like `address_mode` is queryable, and
 `creative_group_by` rejects any dimension not in this list.
 
+Also sets `explodeEntityArrays: true` on the doc — the per-brand switch that makes Copilot's
+group-by fan out array-valued facets. Brands without the flag keep the original behaviour.
+
 Usage:
   python3 loaders/set_copilot_entities.py <brand_id> <facets.json> [--media Video|Image|All]
                                           [--obs obs.json]
@@ -51,5 +54,6 @@ for f in facets:
     data[f] = sorted(values[f])[:200] if values[f] else data.get(f, [])
     key_fields[f] = {**(key_fields.get(f) or {}), "type": a.media}
 
-col.update_one({"_id": doc["_id"]}, {"$set": {"tags.data": data, "tags.keyFields": key_fields}})
+col.update_one({"_id": doc["_id"]}, {"$set": {"tags.data": data, "tags.keyFields": key_fields,
+                                            "explodeEntityArrays": True}})
 print(f"brand {a.brand_id}: {len(facets)} facets registered ({added} new), media={a.media}, total attributes now {len(data)}")
