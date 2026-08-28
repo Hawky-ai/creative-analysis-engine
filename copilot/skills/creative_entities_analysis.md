@@ -94,6 +94,13 @@ For each reported pattern: `view` 2 creatives that carry it (one top, one bottom
 value appears in both) and quote the `_observations` evidence verbatim — the actual line
 spoken, with timing. A pattern with no quotable evidence is not reported.
 
+**Never call `analyze_video` to get a quote, a timing, or "what happens in the video".**
+Every spoken line, its English translation, its timestamp and the beat-by-beat script are
+already stored per creative (`_observations`, `_timeline`); `view(hashes=[...])` returns them
+in one cheap call. `analyze_video` re-watches the file — minutes per video, times out on
+long ones, and produces a fresh, unverifiable description that may not match the stored
+entities. Use it only for a creative that has NO entities row.
+
 **Do NOT call `analyze_video` to get a quote or a timing.** Every spoken line, its English
 translation and its timestamp are already stored per creative in `_observations` (and the
 beat-by-beat script in `_timeline`); `view(hashes=[...])` returns them in one cheap call.
@@ -113,3 +120,42 @@ Use `report_renderer` with FLOW B Section 4 structure, one 4.x block per dimensi
 Coverage note in the Context Block: how many creatives in scope have entities
 (`get_creative_entities` count vs `query_data` creative count). Entities cover the
 top-spend creatives, not every creative — say so.
+
+## 6. Tool-level gotchas (each one has bitten a run)
+
+- **Attribute names are exact.** `creative_group_by` / `include_entities` accept only the
+  names listed in `get_analysis_metadata` → `entities` (lowercase snake_case, e.g.
+  `value_prop`). `Hook`, `CTA`, `Visual_Style`, `USP` are NOT registered for this brand —
+  if a name is rejected, use the facet from the list; do not retry with synonyms.
+- **Multi-value facets arrive as lists.** In `include_entities` / `get_creative_entities`
+  results, `value_prop`, `cta`, `app_ui_shown`, `emotional_register`, `emotional_driver`
+  are Python lists. In `execute`, `df.explode("value_prop")` BEFORE any `groupby` —
+  grouping on a list column raises `unhashable type: 'list'`. If a value comes back as a
+  string that starts with `[`, `json.loads` it first.
+- **Coverage is partial.** Entities exist for the top-spend creatives (~100), not all
+  ~1,365. `include_entities` LEFT JOINs, so uncovered creatives return `""`/`None` for
+  every facet. Drop those rows before grouping (an empty-string group is not a pattern)
+  and state `covered / total` creatives and `covered spend / total spend` in the Context
+  Block. Never describe an uncovered creative's traits — you do not know them.
+- **Date window.** Entities were extracted on lifetime top-spend creatives. Run
+  creative-pattern queries over the brand's full `availableDateRange` unless the user
+  names a window; a default recent window can exclude most covered creatives and the
+  join looks empty.
+- **Ranking duplicates.** If an all-attributes ranking shows the same values under two
+  keys (`format` and `Format`), they are aliases of one facet — report the lowercase one
+  only.
+- **Zero installs.** CPI = spend / installs; guard `installs == 0` (report "no installs",
+  not `inf`), and never rank by CPI a group with < 5 installs.
+- **Language groups too small.** A within-language check on a language with < 5 covered
+  creatives is "n too small", not "holds" or "reverses". `host-recruitment` has ~8
+  covered creatives — anything on it is Exploratory.
+- **`unclear` / `none` are values.** Keep them as their own group; they mean "could not
+  tell" / "not applicable" and are sometimes the interesting cohort (e.g. `none` presenter
+  = no person on screen).
+- **Timeline units.** `_timeline.beats[].t0/t1` are seconds; `duration` is seconds;
+  `video_p25..p100` are viewer COUNTS, not percentages — normalise by `video_p25` (not by
+  `video_play_actions`) when comparing curves across creatives.
+- **One creative, many ads.** Metrics live per ad; a creative is reused across ads and
+  adsets. Aggregate to `hash` (query at `level="creative"`) before comparing creatives, and
+  give the ad count with every creative you name.
+
