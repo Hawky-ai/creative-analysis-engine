@@ -3,7 +3,8 @@
 
 Per hash, one JSON object:
   facet -> "value"              scalar facet
-  facet -> ["v1", "v2"]         multi-value facet (any facet that carries >1 value on ANY
+  facet -> ["v1", "v2"]         multi-value facet (values canonicalised via --dict when given;
+                                _observations keep the surface value + evidence) (any facet that carries >1 value on ANY
                                 creative is emitted as an array on EVERY creative, so the
                                 column type is stable; Copilot's group-by explodes arrays)
   _observations -> [{facet, value, evidence, source}]   verbatim evidence, for `view`
@@ -28,6 +29,7 @@ ap.add_argument("obs_json")
 ap.add_argument("brand_id")
 ap.add_argument("--aliases", help="JSON {facet: [alias, ...]} — publish facet under extra names")
 ap.add_argument("--timeline", help="beat timeline JSON from extract_timeline_vid.mjs")
+ap.add_argument("--dict", help="JSON {facet: {surface value: canonical value}} from the dictionary pass — merges synonyms before load")
 ap.add_argument("--hash-from-url", action="store_true",
                 help="key rows by md5(url)[:16] — matches accounts whose ad_metadata_v3.hash was synthesised from url")
 ap.add_argument("--dry-run", action="store_true")
@@ -37,6 +39,7 @@ def key(r):
     return hashlib.md5(r["url"].encode()).hexdigest()[:16] if a.hash_from_url else r["hash"]
 
 aliases = json.load(open(a.aliases)) if a.aliases else {}
+canon = json.load(open(a.dict)) if a.dict else {}
 timelines = {}
 if a.timeline:
     for r in json.load(open(a.timeline)):
@@ -51,6 +54,7 @@ for r in records:
     grouped = defaultdict(list)
     for o in r["obs"]:
         v = str(o["value"]).strip().lower()
+        v = canon.get(o["facet"], {}).get(v, v)
         if v and v not in grouped[o["facet"]]:
             grouped[o["facet"]].append(v)
     grouped_by_hash[key(r)] = grouped
