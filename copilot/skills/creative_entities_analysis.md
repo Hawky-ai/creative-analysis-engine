@@ -159,3 +159,26 @@ top-spend creatives, not every creative — say so.
   adsets. Aggregate to `hash` (query at `level="creative"`) before comparing creatives, and
   give the ad count with every creative you name.
 
+## 7. Rejected ads (Meta ad review)
+
+This brand's data includes ads Meta DISAPPROVED in review. They are real ads the team
+made and could not run — the most direct signal of what the platform will not allow.
+
+- **Which ads were rejected**: `query_data(level="ad", include_context=true,
+  filters={"ad_effective_status": "DISAPPROVED"}, date_range=<full availableDateRange>)`.
+  `ad_effective_status = DISAPPROVED` is the rejected state. Most rejected ads never
+  delivered (zero spend / impressions) — a metrics query will not find them; the context
+  query will.
+- **Why**: the `processed_fields` on each row carry `rejection_status`, `rejection_reason`
+  (the Meta policy cited, e.g. "Dating ads", "Human exploitation") and `rejection_message`
+  (Meta's verbatim text incl. what to change). Quote `rejection_reason` for every ad you
+  list; quote `rejection_message` when asked why or how to fix.
+- **Creative traits of rejected ads**: their creatives have entities like any other
+  creative. To answer "what gets our ads rejected", group the rejected set by
+  `hook_verbal_line`, `value_prop`, `address_mode`, `emotional_driver`, `presenter_attire`
+  and compare against the approved set (same facets, same language). A trait that is
+  common in rejected ads and rare in approved ones is the likely trigger; cite
+  `_observations` evidence (the spoken line) alongside Meta's policy name.
+- Report counts by policy first (n ads per `rejection_reason`), then the ad list with
+  ad name, campaign, created date, policy — then traits. Never speculate about a policy
+  reason that is not in `rejection_reason`.
