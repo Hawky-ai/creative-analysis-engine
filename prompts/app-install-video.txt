@@ -33,6 +33,14 @@ subtitle_script (how burned-in captions are written — a testable creative choi
 hook (EXACTLY ONE — the attention device of the FIRST 3 SECONDS; put the verbatim opening line with translation and timing in evidence):
 question-to-viewer ("do you also have an iPhone?") | bold-claim ("at 35, the energy of 25") | emotional-moment (crying, laughing, dancing already in progress) | activity-in-progress (mid-task when video opens) | incoming-call (video opens as a call connecting/ringing) | direct-greeting (presenter greets viewer) | curiosity-tease | (other — name it concretely)
 
+hook_verbal_line (the FIRST thing said aloud in the first 3 seconds — value is a SHORT English paraphrase of that line, lowercase, 3-8 words, e.g. "do you have an iphone" / "don't be shy brother" / "i talk for hours here"; evidence = the verbatim original-language line + English translation + timing. If nothing is spoken in the first 3 seconds, value "none" and say what plays instead in evidence)
+
+hook_visual (what is physically on screen during the first 3 seconds — exactly one): face-close-up (presenter's face fills most of the frame) | full-body (presenter seen waist-up or further) | phone-screen (a phone held up / screen recording dominates) | call-ui (video-call interface chrome is the first thing seen) | text-card (a text slate or caption card before any person) | scene (a room/activity/establishing shot before the presenter is the focus)
+
+hook_presenter_action (what the main presenter is DOING in the first 3 seconds — exactly one): talking (speaking to camera, no other action) | waving | dancing | crying | doing-chore (cooking, dishes, folding, any household task) | answering-call (picks up / reacts to an incoming call) | none (no presenter visible in the first 3 seconds)
+
+hook_emotion (the emotion the presenter PERFORMS in the first 3 seconds — exactly one; judge from face, voice and words, evidence says which): playful | flirtatious | urgent | shy | excited | sad | calm | neutral | none (no presenter). Use ONLY these labels — never invent another; if none fits, pick the closest and explain in evidence
+
 production_style: raw-ugc (handheld, natural light, unpolished — deliberately amateur) | polished-ugc (ugc format but visibly produced: stable frame, good light) | staged-professional (set design, professional grade) | ai-generated-look (visibly synthetic or carries an AI label)
 
 ai_content_label: yes (a visible "AI Generated Content" / "AI-Generated" tag appears) | no
@@ -75,7 +83,7 @@ FOCUS BRIEF (optional): if a "FOCUS:" block is appended below this prompt, it li
 
 RULES:
 1. One concept per observation. Two value props = two observations, never merged.
-2. TIMING is mandatory in evidence for hook, cta, and any value_prop — say when it happens ("at 0-2s", "at 14s", "final 2s").
+2. TIMING is mandatory in evidence for hook, all hook_* facets, cta, and any value_prop — say when it happens ("at 0-2s", "at 14s", "final 2s").
 3. Verbatim quotes: give the original language AND an English translation in evidence.
 4. Values must be concrete enough to be meaningful alone — "no phone number needed" not "privacy claim". The category-style facets (format, hook, production_style) are already concrete categories; free facets (value_prop, offer, social_proof) must carry the actual content.
 5. presenter_* facets describe the MAIN presenter (most screen time). A simulated-call's picture-in-picture caller is not the main presenter — note them in scene_description instead.
@@ -83,6 +91,6 @@ RULES:
 7. Never speculate about content you could not see or hear — if audio is silent or music-only, say so via language_spoken and do not invent spoken lines.
 8. Keep every description objective and factual (age band, attire, skin tone, hair, setting) — descriptive only. NEVER make attractiveness or desirability judgments, never infer ethnicity, caste, religion, region-of-origin, or class from appearance, and never speculate about anything not directly visible. Skin tone is recorded as a neutral casting attribute on a fixed scale, exactly like attire or hair — if lighting or filtering makes it genuinely unclear, say "unclear" rather than guessing.
 9. Do not extract platform chrome (the "AD" placement label) — but DO extract a visible "AI Generated Content" tag via ai_content_label, and in-app UI elements via app_ui_shown, since the advertiser chose those.
-10. Typical output: 13 core + 3-8 optional = 16-21 observations per video.
+10. Typical output: 17 core + 3-8 optional = 20-25 observations per video.
 
 Return ONLY JSON: {"observations": [...]}
