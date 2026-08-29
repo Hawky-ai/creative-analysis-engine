@@ -23,6 +23,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("source_brand"); ap.add_argument("target_brand"); ap.add_argument("staged_dir")
 ap.add_argument("--dry-run", action="store_true")
 ap.add_argument("--skip-snapshot", action="store_true")
+ap.add_argument("--daily-date", help="daily_date to stamp ad_metadata_v3 rows with (default: the ad's created date). Use the target brand's latest snapshot day so date-scoped queries see the rows.")
 a = ap.parse_args()
 
 URL = os.environ.get("CLICKHOUSE_URL", "http://127.0.0.1:8123")
@@ -67,7 +68,7 @@ for r in rej:
         "ad_preview_shareable_link": r["preview_shareable_link"], "creative": creative or {},
         "campaign_id": r["campaign_id"], "campaign_name": d.get("campaign_name") or "", "campaign_objective": d.get("campaign_objective") or "",
         "adset_id": r["adset_id"], "adset_name": d.get("adset_name") or "", "media_type": d.get("media_type") or creative.get("type") or "",
-        "hash": h, "account_id": r["account_id"], "insights": {}, "daily_date": r["created_time"][:10], "channel": "meta",
+        "hash": h, "account_id": r["account_id"], "insights": {}, "daily_date": a.daily_date or r["created_time"][:10], "channel": "meta",
         "time": now, "last_updated": now, "version": now, "fetch_id": "rejected-sync",
     })
 
