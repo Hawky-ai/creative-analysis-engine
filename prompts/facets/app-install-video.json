@@ -12,7 +12,7 @@
   "hook_verbal_line": "CORE. Short English paraphrase of the FIRST line spoken in the first 3s (3-8 words); verbatim original + translation + timing in _observations. 'none' if nothing spoken.",
   "hook_visual": "CORE. What is on screen in the first 3s: face-close-up | full-body | phone-screen | call-ui | text-card | scene",
   "hook_presenter_action": "CORE. What the presenter is doing in the first 3s: talking | waving | dancing | crying | doing-chore | answering-call | none",
-  "hook_emotion": "CORE. Emotion performed in the first 3s: playful | flirtatious | urgent | shy | excited | sad | calm | neutral | none",
+  "hook_emotion": "CORE. Emotion performed in the first 3s: playful | flirtatious | confident | reassuring | urgent | shy | excited | sad | calm | neutral | none",
   "production_style": "CORE. raw-ugc | polished-ugc | staged-professional | ai-generated-look",
   "ai_content_label": "CORE. yes | no — a visible 'AI Generated Content' tag",
   "ad_objective_type": "CORE. Which side of the marketplace the ad recruits: user-acquisition (talk to people) | host-recruitment (earn money by taking calls) | unclear. Different funnels — split by this first.",

@@ -39,7 +39,7 @@ hook_visual (what is physically on screen during the first 3 seconds — exactly
 
 hook_presenter_action (what the main presenter is DOING in the first 3 seconds — exactly one): talking (speaking to camera, no other action) | waving | dancing | crying | doing-chore (cooking, dishes, folding, any household task) | answering-call (picks up / reacts to an incoming call) | none (no presenter visible in the first 3 seconds)
 
-hook_emotion (the emotion the presenter PERFORMS in the first 3 seconds — exactly one; judge from face, voice and words, evidence says which): playful | flirtatious | urgent | shy | excited | sad | calm | neutral | none (no presenter). Use ONLY these labels — never invent another; if none fits, pick the closest and explain in evidence
+hook_emotion (the emotion the presenter PERFORMS in the first 3 seconds — exactly one; judge from face, voice and words, evidence says which): playful | flirtatious | confident | reassuring | urgent | shy | excited | sad | calm | neutral | none (no presenter). These are the ONLY allowed values — an energetic/enthusiastic opening is "excited", a warm/sincere one is "reassuring"; never write any other word here, put the nuance in evidence
 
 production_style: raw-ugc (handheld, natural light, unpolished — deliberately amateur) | polished-ugc (ugc format but visibly produced: stable frame, good light) | staged-professional (set design, professional grade) | ai-generated-look (visibly synthetic or carries an AI label)
 
