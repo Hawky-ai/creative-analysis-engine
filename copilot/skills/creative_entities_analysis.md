@@ -165,7 +165,9 @@ This brand's data includes ads Meta DISAPPROVED in review. They are real ads the
 made and could not run — the most direct signal of what the platform will not allow.
 
 - **Which ads were rejected**: `query_data(level="ad", include_context=true,
-  filters={"ad_effective_status": "DISAPPROVED"}, date_range=<full availableDateRange>)`.
+  filters=[{"filter_key": "ad_effective_status", "filter_value": "DISAPPROVED"}], limit=500)`.
+  Always pass `limit` — the default is 100 and the rejected set can be larger; the count you
+  report must equal the rows returned, never a count inside a truncated top-100.
   `ad_effective_status = DISAPPROVED` is the rejected state. Most rejected ads never
   delivered (zero spend / impressions) — a metrics query will not find them; the context
   query will.
