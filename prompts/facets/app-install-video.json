@@ -29,6 +29,7 @@
   "offer": "OPTIONAL. An actual incentive (free coins, free trial). Affordability comparisons are price_metaphor, not offer.",
   "price_metaphor": "OPTIONAL. Colloquial cheapness comparison for the app's cost, e.g. 'price of one egg', 'a packet of pickle'. Localised per language.",
   "device_targeting_signal": "OPTIONAL. Explicit device reference ('do you have an iPhone')",
+  "secondary_content": "MULTI/OPTIONAL. A second, unrelated content strip sharing the frame purely to hold attention (e.g. 'endless-runner gameplay', 'asmr slime', 'cooking b-roll'). Retention filler, not the advertised app.",
   "end_card": "OPTIONAL. What the final 1-2s show",
   "_observations": "PAYLOAD, not an attribute. Array of {facet, value, evidence, source} — verbatim quotes with timing. Use via `view` to cite evidence. Never group by it.",
   "_timeline": "PAYLOAD, not an attribute. {duration, beats:[{t0,t1,role,says,says_en,text,text_en,shows}]} — the video's beat-by-beat structure. Join beat positions against video_p25/p50/p75/p100 to see what plays when viewers leave."

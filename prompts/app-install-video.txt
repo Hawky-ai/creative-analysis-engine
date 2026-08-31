@@ -76,6 +76,8 @@ price_metaphor (a colloquial cheapness comparison for the app's cost — a recur
 
 device_targeting_signal (an explicit device reference — "do you have an iPhone", android mention): concrete reference as value
 
+secondary_content (a SECOND, unrelated content strip sharing the frame with the presenter — usually the bottom or top half — whose only job is holding attention: mobile-game gameplay (runner/parkour games), ASMR or satisfying clips (slime, soap cutting), cooking b-roll, and similar. Emit when present: value is the concrete content type as a short label, e.g. "runner-game gameplay" | "asmr slime" | "cooking b-roll"; evidence says WHERE on screen (bottom half / top half / side), WHEN (usually throughout), and what game/clip it looks like. Do not confuse with app_ui_shown — this is retention filler, not the advertised app.)
+
 end_card (what the final 1-2 seconds show, when there is a distinct closing frame: app logo, install button, phone mockup): describe concretely
 
 ────────────────────────────────────────
