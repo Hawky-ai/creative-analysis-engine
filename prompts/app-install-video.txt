@@ -80,6 +80,8 @@ secondary_content (a SECOND, unrelated content strip sharing the frame with the 
 
 end_card (what the final 1-2 seconds show, when there is a distinct closing frame: app logo, install button, phone mockup): describe concretely
 
+notable_device (ESCAPE HATCH — any prominent, deliberate creative device in this video that NONE of the facets above asks about: a split screen, a picture-in-picture, a game overlay, a countdown, a poll sticker, a green-screen background, a reaction format, anything an analyst would point at and name. Emit one observation per distinct device, value = a short concrete name for the device; evidence = where/when it appears. Omit entirely when everything notable is already covered by other facets — this is for what would otherwise be lost.)
+
 ────────────────────────────────────────
 FOCUS BRIEF (optional): if a "FOCUS:" block is appended below this prompt, it lists the attributes this brand's team most wants captured. Treat every item in it as REQUIRED for this run — emit it even when the value is unremarkable, and be extra literal in its evidence.
 

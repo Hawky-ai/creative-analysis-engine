@@ -78,6 +78,14 @@ One observation = one atomic fact:
     attributes without a prompt rewrite. Agree it BEFORE the first run — a review round
     that discovers a missing attribute costs a full re-extraction.
 
+14. **An escape-hatch facet for unknown unknowns.** Open vocabulary applies to VALUES,
+    not FACETS — the model has nowhere to put a device no facet asks about, so it buries
+    it in scene_description prose where nothing can group by it. Every prompt carries a
+    `notable_device` optional facet ("anything prominent and deliberate that no facet above
+    covers — name it"). *Failure: a split-screen endless-runner gameplay strip — a loud,
+    testable retention device — was invisible to grouping for two extraction rounds; the
+    model had described it in prose every time.*
+
 ## The iteration loop (never skip)
 
 1. **Discover** the brand: inventory, spend, media mix, KPI keys, campaign-name
@@ -97,7 +105,11 @@ One observation = one atomic fact:
 6. **Scale gradually**: ~100 before the full account; check facet-coverage counts and
    value distributions for drift (synonym splits like "expat"/"expatriate" are fine —
    the dictionary stage merges them).
-7. **Human review round.** Put results in a compare/explorer page (see `explorers/`),
+7. **Coverage audit (cheap, automated).** Scan the extracted scene_description prose for
+   recurring phrases that match NO facet value ("a mobile game is playing", "split screen",
+   "reacts to a clip"). Anything that recurs is a missing facet — fix the prompt before the
+   human round. The reviewer should be finding judgment errors, not schema holes.
+8. **Human review round.** Put results in a compare/explorer page (see `explorers/`),
    collect reviewer findings, fold each one back into the prompt. Reviewer catches have
    found real bugs every single time.
 
