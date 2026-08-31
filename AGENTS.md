@@ -72,7 +72,15 @@ doppler run ... -- node extraction/extract_videos.mjs brands/<name>/raw/videos.j
     brands/<name>/raw/obs_vid.json prompts/<vertical>.txt
 ```
 Verify: 0 errors, average observations/creative in the prompt's stated range, facet
-coverage table looks sane (core facets ≈ 100%).
+coverage table looks sane (core facets ≈ 100%). Then run the coverage audit — it is a
+GATE, not a suggestion:
+```
+python3 analysis/coverage_audit.py brands/<name>/raw/obs*.json
+```
+It flags creative devices that recur in scene_description prose but exist in no facet
+value (exit 1). Each flag = a missing facet: fix the prompt and re-extract before the
+review round. A reviewer once caught a split-screen gameplay strip the schema had no
+slot for — this audit would have caught it on round one.
 
 ### 4b. Video beat timeline (separate call — do NOT bundle with entities)
 ```
