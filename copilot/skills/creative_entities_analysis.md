@@ -184,3 +184,11 @@ made and could not run — the most direct signal of what the platform will not 
 - Report counts by policy first (n ads per `rejection_reason`), then the ad list with
   ad name, campaign, created date, policy — then traits. Never speculate about a policy
   reason that is not in `rejection_reason`.
+- **Selection scope warning**: a Selection freezes an ad set at creation time; most
+  rejected ads never delivered and may not be inside it. When the user asks about
+  rejections while a selection is active, ALSO run the account-wide DISAPPROVED context
+  query above and say explicitly: "your selection contains N of the account's M rejected
+  ads". Answering from the selection alone silently undercounts.
+- The rejection reason lives in `processed_fields.rejection_reason` on the DISAPPROVED
+  rows — read it there before concluding it is "not stored"; do not reconstruct a policy
+  from watching the video when the stored reason exists.
