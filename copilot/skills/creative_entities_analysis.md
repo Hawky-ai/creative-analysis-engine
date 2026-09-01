@@ -105,12 +105,6 @@ in one cheap call. `analyze_video` re-watches the file — minutes per video, ti
 long ones, and produces a fresh, unverifiable description that may not match the stored
 entities. Use it only for a creative that has NO entities row.
 
-**Do NOT call `analyze_video` to get a quote or a timing.** Every spoken line, its English
-translation and its timestamp are already stored per creative in `_observations` (and the
-beat-by-beat script in `_timeline`); `view(hashes=[...])` returns them in one cheap call.
-`analyze_video` re-watches the file (minutes, and it times out on long videos) and produces a
-fresh, unverifiable description. Reserve it for a creative that has NO entities row.
-
 Casting facets (`presenter_skin_tone`, `presenter_hair`, `presenter_attire`,
 `presenter_age_band`) are neutral descriptors of what is on screen. Report them as
 "creatives cast with X performed …", never as judgements about people.
