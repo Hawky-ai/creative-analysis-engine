@@ -35,6 +35,10 @@ Two payload keys are NOT attributes — never pass them to `creative_group_by`:
 - `_observations` — `[{facet, value, evidence, source}]`. Evidence is verbatim: quote +
   English translation + timing ("at 0-2s"). This is where you get proof for a claim.
 - `_timeline` — `{duration, beats:[{t0, t1, role, says, says_en, text, text_en, shows}]}`.
+  Present on EVERY video creative, rejected ones included — `says` is the verbatim
+  original-language line, `says_en` its translation. When explaining a rejection, quote
+  the exact beat that carries the violating line with its `t0–t1` seconds (e.g. the
+  "earn money per minute" claim at 7.5–13.5s), not a paraphrase.
   `role` ∈ hook | problem | introduce-app | value-prop | demo | social-proof | price |
   objection-handling | invitation | cta | end-card. Beats are contiguous from 0 to duration.
 
