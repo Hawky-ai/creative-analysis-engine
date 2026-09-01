@@ -186,9 +186,13 @@ made and could not run — the most direct signal of what the platform will not 
   reason that is not in `rejection_reason`.
 - **Selection scope warning**: a Selection freezes an ad set at creation time; most
   rejected ads never delivered and may not be inside it. When the user asks about
-  rejections while a selection is active, ALSO run the account-wide DISAPPROVED context
-  query above and say explicitly: "your selection contains N of the account's M rejected
-  ads". Answering from the selection alone silently undercounts.
+  rejections while a selection is active, run the account-wide DISAPPROVED context query
+  above WITHOUT the selection, in the same turn — never stop to ask "how would you like
+  to proceed" just because the selection has zero disapproved ads. Answer with both
+  numbers: "your selection contains N of the account's M rejected ads; analysing all M."
+  Then do the comparison the user asked for using the account-wide rejected set against
+  the selection's (or account's) high-spend approved set. Zero rejected ads in the
+  selection is NOT zero rejected ads.
 - The rejection reason lives in `processed_fields.rejection_reason` on the DISAPPROVED
   rows — read it there before concluding it is "not stored"; do not reconstruct a policy
   from watching the video when the stored reason exists.
