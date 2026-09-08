@@ -171,3 +171,33 @@ Copilot's group-by / ranking paths explode array-valued attributes (copilot PR
   finding. A real example: "ask lands early = ₹48 vs ₹76 CPI" pooled, but within language it
   REVERSED in 4 of 5 languages — pure Simpson's paradox from language mix. Pooled cuts across
   a multi-language account are confounded by auction price differences per language.
+- Prompts must DESCRIBE the category, never PRESCRIBE the current product/ingredient/claim.
+  Naming today's hero SKU (or worse, prescribing canonical values for it) makes every creative
+  "confirm" what you wrote and silently mislabels anything new. See the section at the end of
+  `prompts/PROMPT_DESIGN.md` — this cost a full re-extraction once already.
+- Newer Gemini models (3.7, 3.8) REJECT an external CDN `fileUri`. The failure surfaces as a
+  misleading `403 The caller does not have permission`, which looks like an auth/allowlist problem
+  and is not — 2.5 accepts the same URL with the same key. Media must be sent as inline bytes
+  (or via the Files API / GCS). `extraction/media-inline.mjs` does the inline path: fetch,
+  ffmpeg-downscale to 480p/2fps, send `inline_data`. The model samples frames at a low rate
+  anyway, so the transcode costs nothing in quality — verified on a 19MB creative: 1.1MB
+  transcoded vs 19MB raw gave the same prompt-token count and the same reading, verbatim
+  on-screen text included. Switching model id alone will NOT work.
+- Build the payload INSIDE the retry loop. Media fetch/transcode happens per item; if it is
+  awaited while constructing the payload outside the `try`, one slow CDN read throws an uncaught
+  AbortError and kills the entire run (65-creative runs died at item 6 this way).
+- Quality gates and loaders must tolerate a malformed observation. One obs missing `value` out of
+  3,115 crashed both `analysis/coverage_audit.py` and `loaders/load_entities_ch.py`; both now skip
+  and count. A gate that dies on one bad row blocks the whole pipeline for nothing.
+- Timeouts, not content, cause most large-video failures. Runs where entity + timeline extraction
+  compete for bandwidth hit the per-request cap and fail ~38% of items. Run them sequentially for
+  big creatives, or raise `video_timeout_ms`. The failures are recorded in `.progress.jsonl` as
+  done — strip the entries that lack real output before re-running, or resume skips them forever.
+- The account keeps being fetched while you work. One brand went 65 -> 75 creatives and
+  ₹2.23cr -> ₹4.45cr of spend mid-session; 10 creatives worth ~48% of spend appeared AFTER the
+  inventory was built. Re-check the hash count against `ad_metadata_v3` before loading, or you
+  ship a half-analysed brand with two schemas in one table.
+- `extracted_entities_v2` is ReplacingMergeTree keyed by hash: loading only replaces the hashes
+  you load. Rows for hashes you did NOT analyse survive with their old schema, leaving a mixed
+  table. Always verify with a `JSONHas(...,'<a new facet>')` count that every row is on the new
+  schema after a replacement load.

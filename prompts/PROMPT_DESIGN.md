@@ -117,3 +117,50 @@ One observation = one atomic fact:
 
 - Images: ~500 creatives ≈ $2–4, ~35 min at concurrency 6.
 - Videos (native watch, 15–75s): ~100 ≈ $2, ~5 min at concurrency 10.
+
+## DESCRIBE THE CATEGORY, NEVER PRESCRIBE THE FINDINGS
+
+The single easiest way to ruin a creative-analysis prompt is to bake today's hero product,
+ingredient, or claim into it. It feels like helpful context. It is contamination: the point of
+this system is to DISCOVER what the creatives do, and a prompt that names the expected answer
+gets that answer back whether or not it is true.
+
+A real example from this repo's history. A haircare prompt opened by naming the current SKU
+("the hero product is a Bond Repair Conditioner with Pro-Vitamin B5 melting pearls, claiming to
+reverse up to 3 years of damage") and its canonicalisation rule went further, prescribing the
+exact strings to use:
+
+```
+- product: use "bond repair conditioner" (NOT "miracle rescue bond repair conditioner")
+- ingredient: "pro-v melting pearls" for the pearls in every phrasing the ad uses
+- benefit: "rebuilds broken bonds" covers "rebuilds broken hair bonds at a molecular level"
+```
+
+Three things go wrong, in increasing order of damage:
+
+1. **It does not even work.** The forced vocabulary leaked anyway — `pro-v melting pearls` 74x
+   alongside `pro-vitamin b5` 10x, `pro-v` 5x, `pro-vitamin b5 melting pearls` 1x.
+2. **It breaks the moment the account changes.** A new range, a serum, a different claim, and
+   the model is being told to collapse an genuinely new thing into a stale label. The analysis
+   silently reports last quarter's product mix.
+3. **It manufactures agreement.** Every creative "confirms" the claim you wrote into the prompt,
+   so the extraction stops being evidence and becomes an echo. You cannot then use it to answer
+   "what are we actually saying in market?" — the prompt already decided.
+
+The rule:
+
+- **DO** give category, objective, buying model, and the shapes ads commonly take — that context
+  measurably improves extraction and costs nothing in bias, because it describes the SPACE.
+- **DO** state explicitly that products/ingredients/claims change between videos and that the
+  model must record what THIS video shows, in its own words.
+- **DON'T** name the current hero SKU, its ingredient story, or its headline claim.
+- **DON'T** prescribe canonical values for open-vocabulary facets. State the canonicalisation
+  PRINCIPLE instead — shortest form that still uniquely identifies it, same thing always gets the
+  same string, drop only non-distinguishing scaffolding, and two genuinely different things MUST
+  get different values. Let the vocabulary emerge from the creatives.
+- Closed-vocabulary facets (format, hook, production_style, hook_emotion…) are the opposite case:
+  those SHOULD enumerate every allowed value, because their whole job is to force comparability.
+
+Test for it: read your prompt and ask "if this brand relaunched with a completely different
+product tomorrow, would this prompt quietly mislabel it?" If yes, the brand knowledge is in the
+wrong layer — it belongs in the analysis you write afterwards, not in the extraction schema.
