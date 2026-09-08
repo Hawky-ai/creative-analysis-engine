@@ -1,102 +1,104 @@
 ---
 name: extract-and-load
 description: >-
-  Run the full extraction over a brand's creatives, verify it, and publish the entities to the
-  warehouse and the brand's facet registry.
-  Use when a run's extract, timeline, verify, load_ch, register_facets or smoke step is pending,
-  or when someone asks to re-run or re-load a brand that already has an approved prompt.
-  Owns the spend confirmation, the load safety rules, and the post-load proof.
+  Run the extraction over all the brand's creatives, check it, and write the entities to
+  ClickHouse and the facet list to Mongo.
+  Use when a run's extract, timeline, verify, load_ch, register_facets or smoke step is still
+  pending, or when someone asks to re-run or re-load a brand that already has an agreed prompt.
+  Covers the cost check, the loading rules, and proving it worked afterwards.
 user-invocable: true
 ---
 
 # extract-and-load
 
-The mechanical half. It still has three places where being careless costs real money or real
-data, and they are all called out below.
+The mechanical half. Three places here cost real money or real data if you rush them.
 
-## 1. Confirm the spend before the batch
+## 1. Say what it will cost first
 
-Extraction calls a paid model on every creative. Before a full run, tell the operator the
-creative count, the rough cost, and roughly how long it will take, and wait for a yes. Sample
-runs of ten or fewer need no permission.
+Every creative is a paid model call. Before a full run, tell the operator how many creatives,
+roughly what it costs and roughly how long, and wait for a yes. Test runs of ten or fewer do
+not need permission.
 
 ## 2. Extract
 
 ```
-# images — OpenAI-schema proxy
+# images
 doppler run ... -- node extraction/extract_images.mjs brands/<name>/raw/images.jsonl \
     brands/<name>/raw/obs_img.json prompts/<vertical>.txt
 
-# videos — Bifrost GenAI, native video watch, resumes from .progress.jsonl
+# videos (resumes from .progress.jsonl if it dies)
 doppler run ... -- node extraction/extract_videos.mjs brands/<name>/raw/videos.jsonl \
     brands/<name>/raw/obs_vid.json prompts/<vertical>.txt
 
-# beat timeline — separate call, videos only
+# beat timeline, videos only, separate call
 doppler run ... -- node extraction/extract_timeline_vid.mjs brands/<name>/raw/videos.jsonl \
     brands/<name>/raw/tl.json prompts/<vertical>-timeline.txt
 ```
 
-Run entities and timeline **sequentially** on a large-video account. When they compete for
-bandwidth they hit the per-request timeout and roughly a third of items fail — and those
-failures are recorded in `.progress.jsonl` as done, so a naive resume skips them forever. If a
-run failed that way, strip the entries with no real output before re-running.
+On an account with big videos, run entities and timeline **one after the other**, not at the
+same time. When they compete for bandwidth they hit the timeout and about a third of items
+fail — and those failures get written into `.progress.jsonl` as done, so resuming skips them
+forever. If that happened, delete the entries with no real output before re-running.
 
-A run with rising wall-time, flat CPU and no new progress output is a stalled socket, not slow
-work: kill it and re-run. Videos resume.
+If a run's clock keeps going up but CPU is flat and nothing new prints, the connection is stuck,
+not slow. Kill it and re-run. Videos resume.
 
-## 3. Verify on the full set, not the sample
+## 3. Check the full set, not the sample
 
-- zero errors
-- observations per creative inside the range the prompt states
-- core facets at or near 100% coverage
-- off-list values on closed facets: should be none
-- `notable_device`: read every value. Recurring ones mean the prompt is behind the creative —
-  that is a return trip to scout-and-prompt, not something to note and move past
-- re-run `analysis/coverage_audit.py` on the full observation set
+- no errors
+- observations per creative in the range the prompt says
+- the important facets answered on nearly every creative
+- closed facets: no answers outside the allowed list
+- `notable_device`: read all of them. If the same thing keeps appearing, the prompt is behind
+  the creatives — that means going back to scout-and-prompt, not noting it and moving on
+- run `analysis/coverage_audit.py` again on the full set
 
-Re-check the creative count against the warehouse now. Accounts keep being fetched while you
-work, and creatives that appeared after the inventory was built would otherwise ship
-unanalysed, leaving two schemas in one table.
+Check the creative count against the warehouse again now. Accounts keep getting fetched while
+you work, and anything that appeared after the list was built would otherwise go unanalysed and
+leave two different schemas in one table.
 
 ## 4. Load
 
 ```
-doppler run ... -- python3 loaders/load_entities_ch.py brands/<name>/raw/obs_all.json <entities_brand_id> \
+doppler run ... -- python3 loaders/load_entities_ch.py brands/<name>/raw/obs_all.json <target_brand_id> \
     --aliases prompts/aliases/<vertical>.json --timeline brands/<name>/raw/tl.json
 ```
 
-Announce the write first — this is a shared table. Then the rules that matter:
+`<target_brand_id>` is the same brand, unless the operator asked for a test brand.
 
-- `extracted_entities_v2` is a ReplacingMergeTree keyed by hash. **Undo means loading the
-  previous state back, never DELETE.** If you are replacing an existing analysis, dump the
-  current rows to a backup file first; that file is the only way back.
-- It only replaces the hashes you actually load. Rows for hashes you did not analyse survive
-  with their old schema, leaving a mixed table. Prove otherwise afterwards with a
-  `JSONHas(..., '<a new facet>')` count over every row for the brand.
-- Pre-merge counts look wrong. Compare with `FINAL`.
-- Never alias a constant to a column name in an `INSERT ... SELECT` — `'X' AS brand_id` shadows
-  the `WHERE` on the same column and silently inserts nothing.
+Say you are about to write before you do — this is a shared table. Then:
+
+- `extracted_entities_v2` keeps one row per hash and replaces it when you load again.
+  **To undo, you load the old rows back. You never DELETE.** If you are replacing an existing
+  analysis, dump the current rows to a file first. That file is the only way back.
+- It only replaces the hashes you actually load. Hashes you did not analyse keep their old
+  rows, so the table ends up half old and half new. Check afterwards with a
+  `JSONHas(..., '<a new facet>')` count over all the brand's rows.
+- Counts look wrong until ClickHouse merges. Compare with `FINAL`.
+- Never write `'X' AS brand_id` in an `INSERT ... SELECT`. The alias hides the `WHERE` on the
+  same column and you insert nothing.
 
 ## 5. Register the facets
 
-The consuming UI reads attribute names from the brand's Mongo metrics document and nothing else,
-so an unregistered facet is invisible no matter how well it loaded.
+The UI reads the list of attributes from the brand's Mongo metrics document and nowhere else.
+A facet that is not registered is invisible no matter how well it loaded.
 
 ```
-MONGO_URI=... python3 loaders/set_copilot_entities.py <entities_brand_id> prompts/facets/<vertical>.json --media video
+MONGO_URI=... python3 loaders/set_copilot_entities.py <target_brand_id> prompts/facets/<vertical>.json --media video
 ```
 
-Two failure modes that both look like "the feature is broken":
+Two mistakes that both look like "the feature is broken":
 
-- Setting the dotted path `tags.keyFields` writes an empty object. Set the whole `tags` object.
-- Every facet needs its media type right — All, Video or Image — or it lands in the wrong
-  section of the UI and reads as missing.
+- Writing to `tags.keyFields` directly puts an empty object there. Write the whole `tags`
+  object instead.
+- Each facet needs the right media type — All, Video or Image — or it shows up in the wrong
+  part of the UI and looks missing.
 
 ## 6. Prove it works
 
-Run three real queries before telling anyone it is done: a group-by on a multi-value facet, an
-evidence question that has to return the verbatim quote, and a within-language or
-within-segment comparison. All three must succeed.
+Run three real queries before saying it is done: group by a multi-value facet, ask a question
+that has to return an exact quote, and compare within one language or segment. All three have
+to work.
 
-Then report plainly: creatives analysed, observations written, coverage, what the data now
-answers, and anything that failed. Mark the remaining steps in `run.yaml`.
+Then report plainly: how many creatives, how many observations, coverage, what the data can now
+answer, and anything that failed. Set the rest of the steps in `run.yaml`.

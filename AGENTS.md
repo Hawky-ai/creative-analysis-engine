@@ -6,22 +6,25 @@ Read `README.md` for what the system is; read this for how to drive it.
 
 ## The guided flow
 
-A fresh clone is driven by an interview, not by guesswork. Opening this repo in Claude Code
-runs `bin/cae-session-start.sh` (SessionStart hook), which reports tool and credential
-readiness and where every brand run is parked, then names the skill to load next.
+Ask, do not guess. Opening this repo in Claude Code runs `bin/cae-session-start.sh`, which
+says which tools and credentials are there, where every brand run stopped, and which skill to
+load next.
 
-| Skill | Owns | Invoke |
+| Skill | What it does | Invoke |
 |---|---|---|
-| `onboard-brand` | intake interview, workspace, discovery, inventory | `/onboard-brand` |
-| `scout-and-prompt` | scout sample, prompt design, feedback loop, coverage gate | `/scout-and-prompt` |
-| `extract-and-load` | full extraction, verification, warehouse load, facet registry | `/extract-and-load` |
+| `onboard-brand` | asks what to analyse, sets up the folder, pulls the account's numbers, builds the creative list | `/onboard-brand` |
+| `scout-and-prompt` | watches a sample, writes the prompt, tests it, checks nothing is missing | `/scout-and-prompt` |
+| `extract-and-load` | runs it on everything, checks it, writes to ClickHouse and Mongo | `/extract-and-load` |
 
-Each run keeps its state in `brands/<name>/run.yaml` (template: `brands/example/run.yaml`).
-Update the step keys as you go — that file is the only thing that survives a lost session, and
-an unrecorded step is a step someone runs twice.
+Each run keeps its state in `brands/<name>/run.yaml` (copy `brands/example/run.yaml`). Update
+the steps as you go — that file is all that survives if the session dies, and a step you did
+not record is a step someone runs twice.
 
-The skills own the *how* for the entity-extraction path. This file stays the reference for the
-whole system, including the analysis and enforcement stages, which are not on the guided path.
+By default the entities go back to the same brand. Only write to a **test brand** when the
+operator asks for one.
+
+The skills cover the extraction path. This file is the reference for everything, including the
+analysis and enforcement stages, which are not in the skills.
 
 ## Ground rules
 

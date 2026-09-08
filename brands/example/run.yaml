@@ -1,9 +1,8 @@
-# Run state for one brand. Created by the onboard-brand skill, updated after every step.
-# The session-start digest reads this to work out where a run is parked, so keep the step
-# keys and their order exactly as written. A step is pending while its value is empty or
-# "todo"; anything else counts as settled.
-brand: example                  # workspace name, matches brands/<name>/
-brand_id: ""                    # warehouse brand id the creatives are read FROM
+# State for one brand run. Made by the onboard-brand skill, updated after every step.
+# The session digest reads this to see where a run stopped, so keep the step names and their
+# order as they are. A step counts as pending while it says "todo" or is blank.
+brand: example                  # folder name, matches brands/<name>/
+brand_id: ""                    # the brand whose creatives you read
 created: ""                     # YYYY-MM-DD
 
 secrets:
@@ -12,18 +11,20 @@ secrets:
 
 scope:
   media: [video, image]
-  date_from: ""                 # blank = whole account history
+  date_from: ""                 # blank = the whole account
   date_to: ""
-  spend_gate: 0                 # min lifetime spend per creative; 0 = take everything in scope
-  campaign_filter: ""           # optional campaign name/id restriction
-  scout_sample: 15              # creatives read open-endedly before the prompt is written
+  spend_gate: 0                 # lowest spend a creative needs to be worth analysing; 0 = all
+  campaign_filter: ""           # optional, limit to one campaign
+  scout_sample: 15              # how many creatives to watch before writing the prompt
 
-targets:
-  entities_brand_id: ""         # brand id entities are written TO; differs from brand_id for a test brand
-  register_facets: true         # write the facet list into the brand's Mongo metrics doc
+output:
+  test_brand_id: ""             # LEAVE BLANK unless the operator asked for a test brand.
+                                # Blank = entities go back to the same brand.
+  register_facets: true         # add the facet list to the brand's Mongo metrics doc
   load_timeline: true
 
-vertical: ""                    # prompts/<vertical>.txt — named after the CATEGORY, not the brand
+vertical: ""                    # prompts/<vertical>.txt — name it after the kind of product,
+                                # not the brand, so the next similar brand can reuse it
 
 steps:
   discover: todo
@@ -39,4 +40,4 @@ steps:
   register_facets: todo
   smoke: todo
 
-log: []                         # one line per settled step: "YYYY-MM-DD <step> <what happened>"
+log: []                         # one line per finished step: "YYYY-MM-DD <step> <what happened>"

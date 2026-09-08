@@ -1,16 +1,17 @@
 # creative-analysis-engine
 
-Turn an ad account's creatives into **queryable, evidence-backed entities** — then into
-statistically honest performance patterns. A multimodal LLM watches every image and
-video, writes atomic observations (`{facet, value, evidence, source}`), and a chain of
-deterministic analysis stages turns those into cohort verdicts, causal effects, winning
-recipes, and backtested trends. An enforcement layer validates every LLM-written insight
-against the stored evidence, so nothing fabricated ships.
+Turns an ad account's creatives into data you can query. A model watches every image and
+video and writes down what is in them — one fact at a time, each with the exact quote or
+detail it came from. After that you can group, compare and rank creatives by what they
+actually contain, instead of by gut feel.
 
-Proven across seven accounts and five verticals — ed-tech lead-gen video, FMCG
-retail-media banners, app-install vernacular video, haircare awareness video, and social
-calling apps. The backtest on the strongest account held on 6/6 launch-date cutoffs
-(picked creatives ≈ 60% cheaper than launching blind).
+There is a second half that turns those facts into performance findings, with a check that
+throws out any claim whose evidence does not hold up.
+
+Used on seven accounts across five kinds of product: ed-tech lead-gen video, FMCG banners,
+app-install video in Indian languages, haircare video, and social calling apps. On the
+strongest account, creatives it picked were about 60% cheaper than launching blind, and that
+held on all 6 date cutoffs it was tested against.
 
 ## Quick start
 
@@ -19,83 +20,80 @@ gh repo clone Hawky-ai/creative-analysis-engine
 cd creative-analysis-engine && ./install.sh && claude
 ```
 
-This repo is **private**, so it cannot be piped from `raw.githubusercontent.com` — that returns
-a 404 for anyone without a token, which reads as "file missing" rather than "not authorized".
-`gh repo clone` reuses the credentials the GitHub CLI already holds; `gh auth login` first if
-you have never used it here.
+This repo is **private**, so you cannot pipe it from `raw.githubusercontent.com` — that gives a
+404 to anyone without a token, which looks like the file is missing when really you just are not
+logged in. `gh repo clone` uses the login the GitHub CLI already has. Run `gh auth login` first
+if you have never used it here.
 
-`install.sh` checks the toolchain (`node`, `python3`, `ffmpeg`, `curl`) and seeds `.env`. It
-installs nothing globally, touches nothing outside the clone, and re-running it later updates
-the clone in place.
+`install.sh` checks you have `node`, `python3`, `ffmpeg` and `curl`, and creates `.env`. It
+installs nothing globally and touches nothing outside the clone. Run it again later and it just
+updates the clone.
 
-Launching a coding agent inside the clone is the whole interface. There is no CLI to learn and
-no config to fill in first: the agent reads `AGENTS.md`, runs a session digest, and with no
-brand run present it loads the `onboard-brand` skill and **interviews you** — the brand, where
-the entities get written, the scope, the credentials, and what the team actually wants to learn.
-Nothing touches a database or a paid model until it has those answers.
+Opening a coding agent inside the clone is the whole interface. Nothing to learn, no config to
+fill in first: the agent reads `AGENTS.md`, prints what it can see, and if there is no run yet
+it loads the `onboard-brand` skill and **asks you** — which brand, what scope, which
+credentials, and what the team wants to learn from this. It does not touch a database or spend
+money on a model until it has those answers.
 
 ## The guided flow
 
-The flow splits at its real seam: two of the steps are arithmetic, and two need judgment. That
-is why an agent drives this repo instead of a cron job.
+Some steps are just maths. Two of them need someone to think. That is why an agent runs this
+and not a cron job.
 
 | Skill | Owns | Nature |
 |---|---|---|
-| `onboard-brand` | intake interview, workspace, discovery, creative inventory | mechanical |
-| `scout-and-prompt` | scout sample, prompt design, feedback loop, coverage gate | **judgment** |
-| `extract-and-load` | full extraction, verification, warehouse load, facet registration | mechanical |
+| `onboard-brand` | asks what to analyse, sets up the folder, pulls the account's numbers, builds the creative list | mechanical |
+| `scout-and-prompt` | watches a sample, writes the prompt, tests it, checks nothing is missing | **needs judgment** |
+| `extract-and-load` | runs it on everything, checks it, writes it to ClickHouse and Mongo | mechanical |
 
-**Scout before you write.** A sample of real creatives goes through a deliberately open-ended
-prompt — no facet list, no schema, no vocabulary — spread across language, spend band and
-launch date. Reading those outputs is what tells you which facets deserve to exist. It is also
-what stops the last brand's schema being copied onto this one, which is the most expensive
-mistake this flow can make.
+**Watch before you write.** About 15 real creatives go through a prompt with no facet list and
+no schema at all — just "describe what is in this" — picked across languages, spend levels and
+dates. Reading those is what tells you which attributes are worth having. It is also what stops
+you copying the last brand's setup onto this one, which is the worst mistake you can make here.
 
-**Then the feedback loop.** Re-run on the same sample, audit against the creatives, and fix the
-*prompt* — never the output. A hand-corrected extraction is a lie that scales, and the next
-batch reproduces the original error. On one brand this collapsed a `cta` facet from 21
-near-identical values to the 5 that were really there.
+**Then test the prompt.** Run it on the same sample again, compare against the creatives, and
+fix the *prompt* — never the output. Correcting output by hand is a lie that scales, and the
+next batch just repeats the mistake. On one brand this turned a `cta` attribute with 21
+near-identical answers into the 5 that were really there.
 
-**Then the gate.** `analysis/coverage_audit.py` flags creative devices that recur in the prose
-but exist in no facet value, and exits non-zero when it finds any. Its limit is stated plainly
-in the skill rather than papered over: it matches a hardcoded word list, so it reliably catches
-the *last* surprise and not necessarily the next one. Running it on every incremental batch and
-watching what keeps landing in `notable_device` is what closes the rest of the gap.
+**Then the check that blocks.** `analysis/coverage_audit.py` looks for things that keep showing
+up in the descriptions but have no attribute, and fails if it finds any. It matches a fixed list
+of words, so it catches last time's surprise and not necessarily next time's — the skill says so
+rather than pretending otherwise. Running it on every batch, and reading what keeps landing in
+`notable_device`, covers the rest.
 
-Run state lives in `brands/<name>/run.yaml`, so a lost session resumes at the step it stopped on
-instead of repeating a paid one. `bin/cae-session-start.sh` reads it and reports where every
-brand is parked.
+Each run's state is in `brands/<name>/run.yaml`, so if the session dies you pick up at the step
+it stopped on instead of paying for it twice. `bin/cae-session-start.sh` prints where every
+brand is.
 
-The guided path covers entity extraction end to end. The analysis and enforcement stages below
-are driven by hand from `AGENTS.md`.
+This path covers the extraction end to end. The analysis and enforcement stages further down
+are run by hand from `AGENTS.md`.
 
 ## How it works
 
 ```
-inventory (warehouse) ──► extraction (LLM watches media) ──► canonical observations
+creative list ──────────► a model watches each one ──────► facts, with evidence
                                                                     │
                        ┌────────────────────────────────────────────┤
                        ▼                                            ▼
-              analysis stages (deterministic)              per-creative entities
-   patterns · discriminative tiers · causal engine         (loaders/ → warehouse,
-   recipes · strict backtest · lifecycle · tail hunt        for downstream agents)
+              analysis (numbers, no model)                 per-creative facts
+   cohorts · top vs bottom · causal · winning combos       (loaders/ → ClickHouse,
+   backtest · month-by-month · cheap-but-unscaled           for whatever reads it)
                        │
                        ▼
-        reasoning (LLM writes insights)
+        a model writes the findings
                        │
                        ▼
-        ENFORCEMENT (validate → repair → drop)   ◄── the honesty gate
+        CHECK (validate → repair → drop)   ◄── throws out unproven claims
 ```
 
-**The observation contract** is the core idea: facets are fixed questions per vertical,
-values are open-vocabulary answers, and every observation carries verbatim evidence
-(with timing, for video) and a source (headline / pack text / spoken / subtitle /
-on-screen UI). That makes extractions comparable across thousands of creatives AND
-auditable by a human in seconds.
+**The main idea:** the questions are fixed per kind of product, the answers are open, and every
+answer comes with the exact evidence for it — the quote, when it was said, and where it came
+from (headline, pack text, spoken, subtitle, on-screen). That makes thousands of creatives
+comparable, and lets a human check any one of them in seconds.
 
-Videos get a **second, separate** call for the beat timeline — a contiguous 0→end breakdown
-with a closed `role` vocabulary. Keep it separate: bundling it into the entity prompt degraded
-both readings and cost 5× the prompt tokens.
+Videos get a **second, separate** call that breaks the video into beats from start to finish.
+Keep it separate — putting it in the same prompt made both worse and cost 5x the tokens.
 
 ## Repo layout
 
@@ -110,7 +108,7 @@ both readings and cost 5× the prompt tokens.
 | `.env.example` | Every env var the engine needs; inject via your secret manager |
 | `prompts/` | The extraction prompt library, one per vertical + `PROMPT_DESIGN.md` (the methodology — read before writing any new prompt) |
 | `extraction/` | `extract_images.mjs` (OpenAI-schema proxy), `extract_videos.mjs` and `extract_timeline_vid.mjs` (GenAI schema, auto-resume), `media-inline.mjs` (fetch → downscale → inline bytes) |
-| `analysis/` | `coverage_audit.py` (the gate) plus the deterministic stages: `patterns.py`, `discriminative.py`, `engine_v3.py`, `recipes.py`, `backtest_strict_launch.py`, `trend_lifecycle.py`, `tail_hunt.py`, `matched_pairs.py`, `first3s.py`, `fatigue.py` |
+| `analysis/` | `coverage_audit.py` (the check that blocks) plus the number-crunching stages: `patterns.py`, `discriminative.py`, `engine_v3.py`, `recipes.py`, `backtest_strict_launch.py`, `trend_lifecycle.py`, `tail_hunt.py`, `matched_pairs.py`, `first3s.py`, `fatigue.py` |
 | `enforcement/` | `reasoning_v3.mjs` → `validate_insights.py` → `repair_insights.mjs`: LLM insights are checked against stored evidence (proof hashes must exist, quotes must match verbatim); unrepairable ones are dropped |
 | `loaders/` | `load_entities_ch.py` (entities → ClickHouse), `set_copilot_entities.py` (facet registry), `sync_rejected_ads.py` |
 | `brands/` | Per-brand workspaces (gitignored — data never enters the repo). `brands/example/` holds the `run.yaml`, `brand.yaml` and `focus.md` templates |
@@ -133,44 +131,40 @@ extraction:
   ...
 ```
 
-Any OpenAI-compatible gateway works for images and reasoning; video goes through a GenAI-schema
-endpoint for native video watching.
+Any OpenAI-compatible gateway works for images. Video goes through a Gemini-native endpoint,
+because that is what can actually watch a video.
 
-**Media is sent as inline bytes, not as a URL.** The newer Gemini models reject an external CDN
-`fileUri`, and the failure surfaces as a misleading `403 The caller does not have permission`
-that looks exactly like an auth problem and is not. `extraction/media-inline.mjs` fetches the
-media, downscales video to 480p/2fps with ffmpeg, and sends `inline_data`. The model samples
-frames at a low rate anyway, so the transcode costs nothing in quality — verified on a 19MB
-creative: 1.1MB transcoded gave the same prompt-token count and the same reading, verbatim
-on-screen text included. This is why `ffmpeg` is a real dependency.
+**The media is uploaded, not linked.** The newer Gemini models refuse a CDN URL, and they say so
+with a `403 The caller does not have permission` — which looks like a login problem and is not.
+So `extraction/media-inline.mjs` downloads the file, shrinks video to 480p at 2 frames a second
+with ffmpeg, and sends the bytes. The model only looks at a few frames a second anyway, so
+shrinking it costs nothing: on a 19MB creative, the 1.1MB version used the same tokens and gave
+the same reading, down to the exact on-screen text. That is why `ffmpeg` is actually needed.
 
 ## Principles
 
-1. **Evidence or it didn't happen.** Every value carries a verbatim quote or precise
-   visual description; every LLM-written insight is machine-validated against that
+1. **Evidence or it didn't happen.** Every answer carries the exact quote or a precise
+   description of what was on screen. Every finding the model writes is checked against that
    evidence before it ships.
-2. **Fixed questions, open answers.** Comparability comes from the facet backbone;
-   discovery comes from open vocabulary values.
-3. **Describe the category, never prescribe the findings.** A prompt that names today's hero
-   product or its canonical claims makes every creative "confirm" what you wrote, and silently
-   mislabels anything new. The test before shipping a prompt: *if this brand relaunched with a
-   completely different product tomorrow, would this prompt quietly mislabel it?* This one cost
-   a full re-extraction before it became a rule.
-4. **The backtest is the honesty gate.** A pattern that doesn't survive
-   train-on-ended / test-on-launched-after splits is reported as such — this engine has
-   publicly retracted its own headline result once, and that protocol is now built in.
-5. **Prompts are code.** Versioned, reviewed, changed via PR with the failing creative
-   attached. Feedback loop: reviewer finding → issue → prompt clause naming the failure
-   → re-test on knowns.
-6. **Analysis is deterministic.** LLMs extract and narrate; statistics decide. Bootstrap
-   CIs for verdicts, causal separation for "the ad vs the campaign it sat in".
+2. **Fixed questions, open answers.** The fixed questions make creatives comparable. The open
+   answers are how you find things you did not expect.
+3. **Describe the kind of product, not today's product.** Name the current hero product or its
+   usual claims and every creative will "confirm" what you wrote, while anything new gets
+   labelled wrong. Test before shipping: *if this brand launched something completely different
+   tomorrow, would this prompt label it wrong?* This cost a full re-run before it became a rule.
+4. **The backtest decides.** A pattern that does not survive being trained on old creatives and
+   tested on newer ones gets reported as not surviving. This engine has publicly taken back its
+   own headline result once, and that check is now built in.
+5. **Prompts are code.** Versioned, reviewed, changed through a PR with the creative that broke
+   them attached.
+6. **The model describes, the statistics decide.** The model extracts and narrates. Numbers
+   decide what is real.
 
 ## Driving it by hand
 
-Everything the skills do can be run directly. Full brand onboarding — discovery, prompt design,
-extraction, analysis, enforcement, review, loading — is step by step in
-[`AGENTS.md`](AGENTS.md), which also carries the accumulated pitfalls. The prompt-design
-checklist, every rule earned from a real observed failure, is in
+Everything the skills do can be run directly. The whole thing, step by step, is in
+[`AGENTS.md`](AGENTS.md), along with every mistake already made so you do not repeat them. The
+prompt checklist — every rule there came from something that actually went wrong — is in
 [`prompts/PROMPT_DESIGN.md`](prompts/PROMPT_DESIGN.md).
 
 ```bash
@@ -184,6 +178,6 @@ doppler run -- node extraction/extract_images.mjs brands/<name>/raw/sample.jsonl
 
 ## Contributing / feedback
 
-File an issue with: the creative (hash + media URL), what the extraction said, what it
-should have said. Prompt fixes reference the issue and re-test against the sample set
-before merging. See `prompts/PROMPT_DESIGN.md` §"The iteration loop".
+Open an issue with the creative (hash and media URL), what the extraction said, and what it
+should have said. Prompt fixes link the issue and get re-tested on the sample before merging.
+See `prompts/PROMPT_DESIGN.md`.

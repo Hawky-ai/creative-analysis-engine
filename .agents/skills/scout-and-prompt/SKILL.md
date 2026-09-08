@@ -1,112 +1,112 @@
 ---
 name: scout-and-prompt
 description: >-
-  Read a sample of the brand's real creatives open-endedly, then design, test and gate the
-  extraction prompt for them.
-  Use when a run's scout, prompt, feedback or coverage_audit step is pending, when someone asks
-  to write or fix an extraction prompt, or when a review round says the entities missed something.
-  This is the judgment half of the flow; the mechanical half is extract-and-load.
+  Watch a sample of the brand's real creatives with no schema, then write, test and check the
+  extraction prompt.
+  Use when a run's scout, prompt, feedback or coverage_audit step is still pending, when
+  someone asks to write or fix an extraction prompt, or when a review says the entities
+  missed something.
+  This is the part that needs judgment. extract-and-load is the mechanical part.
 user-invocable: true
 ---
 
 # scout-and-prompt
 
-Everything downstream is arithmetic on what this prompt asks for. A facet that is not in the
-prompt does not exist in the warehouse, and no amount of later querying recovers it. This step
-is why an agent runs this repo instead of a cron job.
+Everything after this is just maths on whatever the prompt asked for. If a facet is not in the
+prompt, it does not exist in the warehouse, and no query later will get it back. This is why an
+agent runs this repo instead of a cron job.
 
-Read `prompts/PROMPT_DESIGN.md` before writing a line. It is the methodology; this skill is the
-order of operations.
+Read `prompts/PROMPT_DESIGN.md` before writing anything. That file is the method. This one is
+the order you do it in.
 
 ## 1. Scout — watch before you write
 
-Send `scope.scout_sample` creatives through a deliberately **open-ended** prompt: no facet list,
-no schema, no vocabulary. Ask what is in the creative and let the model describe it freely.
-Spread the sample across language, spend band, media type, and launch date — a sample drawn only
-from top spenders describes the winners' formula, not the account.
+Send `scope.scout_sample` creatives through a prompt with **no facet list, no schema, no
+vocabulary**. Just ask what is in the creative and let the model describe it.
+
+Spread the sample across languages, spend levels, media types and launch dates. A sample of
+only the top spenders tells you what the winners do, not what the account does.
 
 Then read the outputs yourself. You are looking for:
 
-- what varies between creatives, since only variation can ever explain performance
-- what is constant, since a facet that is the same everywhere is dead weight in every query
-- devices you would never have predicted — the gameplay strip, the reaction inset, the
-  screen-recorded chat
+- what changes between creatives — only things that vary can ever explain performance
+- what is the same in all of them — a facet that never changes is dead weight in every query
+- things you would not have guessed: a gameplay strip along the bottom, a reaction inset, a
+  screen recording of a chat
 
-Include the brand's failures in the sample if the account has rejected or paused creatives.
-They differ from the winners in exactly the ways worth naming.
+If the account has rejected or paused creatives, put some in the sample. They fail in exactly
+the ways worth naming.
 
-## 2. Design the prompt
+## 2. Write the prompt
 
-Structure, in this order: a preamble that says what kind of product this is and what a viewer is
-being asked to do, then the facet list, then the evidence and output rules.
+Order: a short preamble saying what kind of product this is and what the viewer is being asked
+to do, then the facet list, then the rules for evidence and output.
 
-Facets come in two kinds and you must be deliberate about which:
+Two kinds of facet, and pick on purpose:
 
-- **Closed** — a fixed enum. Buys comparability: every creative answers on the same scale, so a
-  group-by means something. Use it where the answer space is genuinely bounded.
-- **Open** — vocabulary emerges from the creatives. Buys discovery, costs comparability. Use it
-  where enumerating the answers up front would be guessing.
+- **Closed** — a fixed list of allowed answers. Every creative answers on the same scale, so
+  grouping by it means something. Use it when the possible answers really are limited.
+- **Open** — the model answers in its own words. You find things you did not expect, but the
+  answers are harder to compare. Use it when writing the list up front would be guessing.
 
-Every observation carries `{facet, value, evidence, source}`. The evidence is a verbatim quote
-with timing for video, and it is what makes an extraction auditable by a human in seconds
-instead of trusted on faith. Never let a facet ship without it.
+Every observation carries `{facet, value, evidence, source}`. The evidence is the exact quote,
+with a timestamp for video. That is what lets a human check an extraction in seconds instead
+of just trusting it. No facet ships without it.
 
-Always include the `notable_device` escape hatch: anything striking that no facet covers. It is
-the only channel through which the prompt can tell you it is out of date.
+Always include `notable_device`: anything striking that no facet covers. It is the only way the
+prompt can tell you it has gone out of date.
 
-**The rule that has already cost a full re-extraction:** describe the CATEGORY, never prescribe
-the current product. Naming today's hero SKU, ingredient or claim makes every creative "confirm"
-what you wrote and silently mislabels anything new. The test, before you ship the prompt: *if
-this brand relaunched with a completely different product tomorrow, would this prompt quietly
-mislabel it?* If yes, rewrite it. The long version is the last section of `PROMPT_DESIGN.md`.
+**The rule that already cost a full re-run:** describe the *kind* of product, never today's
+specific one. Name the current hero product, ingredient or claim and every creative will
+"confirm" what you wrote, while anything new gets labelled wrong. Test before shipping: *if
+this brand launched a completely different product tomorrow, would this prompt label it wrong?*
+If yes, rewrite. Long version is at the end of `PROMPT_DESIGN.md`.
 
-Append the operator's focus brief verbatim as a `FOCUS:` block; those attributes are required
-output for every creative.
+Paste what the team said into the prompt as a `FOCUS:` block, word for word. Those are required
+for every creative.
 
-Videos additionally get a **separate** beat-timeline prompt, `prompts/<vertical>-timeline.txt`.
-Keep it separate. Bundling the timeline into the entity prompt degraded both readings and cost
-5x the prompt tokens; split, the same run went 100/100 clean.
+Videos also get a **separate** prompt for the beat timeline, `prompts/<vertical>-timeline.txt`.
+Keep it separate. Putting the timeline in the entity prompt made both worse and cost 5x the
+tokens.
 
-## 3. Feedback loop — the part people skip
+## 3. Test it — the part people skip
 
-Re-run the prompt on the same sample and audit the output against the creatives:
+Run the prompt on the same sample again and check the output against the creatives:
 
-- Is every core facet answered on close to 100% of creatives? A facet that is often absent is
-  either badly worded or does not apply to this account.
-- Is one idea fragmenting across many near-identical values? On one brand `cta` came back with
-  21 distinct values that were really 5. Tighten the wording; do not clean the output.
-- Did the model invent a value it could not have seen? Check the evidence quote against the
-  creative.
+- Is every important facet answered on nearly every creative? One that is often blank is
+  either badly worded or does not apply here.
+- Is one idea split across lots of near-identical answers? On one brand `cta` came back with
+  21 values that were really 5. Reword the prompt; do not clean up the output.
+- Did the model make something up? Check the evidence quote against the creative.
 
 **Fix the prompt, never the output.** A hand-corrected extraction is a lie that scales, and the
-next batch reproduces the original error.
+next batch makes the same mistake again.
 
-Loop until an audit round finds nothing. Two or three rounds is normal.
+Repeat until a round finds nothing. Two or three rounds is normal.
 
-## 4. Coverage audit — a gate, not a suggestion
+## 4. Coverage check — this one blocks
 
 ```
 python3 analysis/coverage_audit.py brands/<name>/raw/scout_obs.json
 ```
 
-It flags creative devices that recur in the prose descriptions but exist in no facet value, and
-exits non-zero when it finds any. Each flag is a missing facet: fix the prompt and re-extract
-before the review round, not after.
+It looks for things that keep showing up in the written descriptions but have no facet, and
+exits with an error if it finds any. Each one is a missing facet: fix the prompt and re-extract
+before the review, not after.
 
-Know its limit, and say so to the operator rather than implying more safety than exists: it
-matches a hardcoded word list, so it reliably catches the last surprise and not necessarily the
-next one. Two habits close the rest of the gap — run it on every incremental batch, not only the
-first, and watch what keeps landing in `notable_device`. A value that recurs across a batch is
-the schema telling you it has fallen behind the creative, and it should be promoted to a real
-facet.
+Be straight with the operator about what it does and does not do. It matches a fixed list of
+words, so it catches last time's surprise, not necessarily next time's. Two habits cover the
+rest: run it on every batch, not just the first, and read what keeps landing in
+`notable_device`. If the same thing shows up again and again, the prompt is behind the
+creatives and that thing should become a real facet.
 
-## 5. Ship the prompt
+## 5. Ship it
 
-Prompts are code: commit `prompts/<vertical>.txt`, `prompts/<vertical>-timeline.txt` and
-`prompts/facets/<vertical>.json` (one line of plain meaning per facet, used to register the
-facets later — keep it in sync with the prompt or the UI shows attributes nobody can interpret).
+Prompts are code. Commit `prompts/<vertical>.txt`, `prompts/<vertical>-timeline.txt` and
+`prompts/facets/<vertical>.json` (one plain-English line per facet — this is what gets
+registered later, so keep it matching the prompt or the UI shows names nobody can read).
 
-Brand data stays out of the repo; the prompt belongs in it.
+Brand data stays out of the repo. The prompt goes in it.
 
-Mark the steps settled in `run.yaml`, tell the operator what the prompt captures and what it
-deliberately does not, then load **extract-and-load**.
+Set the steps in `run.yaml`, tell the operator what the prompt captures and what it does not,
+then load **extract-and-load**.
