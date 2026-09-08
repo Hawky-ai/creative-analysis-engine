@@ -25,10 +25,18 @@ else
   echo "TOOLS ok (node python3 ffmpeg curl)"
 fi
 
-if have doppler; then
-  echo "SECRETS doppler present - run every credentialed command as: doppler run --project <p> --config <c> -- <cmd>"
+creds_set=no
+if [ -f .env ] && grep -qE '^(LLM_API_KEY|BIFROST_API_KEY|CLICKHOUSE_PASSWORD)=.+' .env 2>/dev/null; then
+  creds_set=yes
+fi
+
+if [ "$creds_set" = yes ]; then
+  echo "CREDS .env is filled in"
+elif have doppler; then
+  echo "CREDS .env has no values yet. Either fill it in, or use doppler:"
+  echo "CREDS   doppler run --project <p> --config <c> -- <cmd>"
 else
-  echo "SECRETS doppler NOT found - the operator has to supply the env vars another way (.env.example lists them)"
+  echo "CREDS .env has no values yet - fill it in before running anything that needs a key"
 fi
 
 if curl -s -m 3 "${CLICKHOUSE_HTTP:-http://127.0.0.1:8123}/ping" >/dev/null 2>&1; then
@@ -43,8 +51,18 @@ runs=$(find brands -mindepth 2 -maxdepth 2 -name run.yaml 2>/dev/null | grep -v 
 if [ -z "$runs" ]; then
   echo "RUNS none"
   echo
-  echo "NEXT no brand run here yet. Load the onboard-brand skill and ask the operator what to"
-  echo "NEXT analyse before doing anything else. Do not guess the brand id or the scope."
+  if [ "$creds_set" = no ]; then
+    echo "NEXT first time here. In a few lines, tell them what this repo does: a model watches"
+    echo "NEXT every creative in their ad account and writes down what is in it, with the exact"
+    echo "NEXT quote it came from, so they can group and compare creatives by content."
+    echo "NEXT Then show them the variable names in .env and ask them to fill in the ones they"
+    echo "NEXT have. Do not ask them to type a secret to you - they edit the file themselves."
+    echo "NEXT doppler instead of .env is fine; just ask which project and config."
+    echo "NEXT After that, load the onboard-brand skill."
+  else
+    echo "NEXT no brand run here yet. Load the onboard-brand skill and ask the operator what to"
+    echo "NEXT analyse before doing anything else. Do not guess the brand id or the scope."
+  fi
   exit 0
 fi
 

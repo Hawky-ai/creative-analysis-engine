@@ -25,15 +25,11 @@ This repo is **private**, so you cannot pipe it from `raw.githubusercontent.com`
 logged in. `gh repo clone` uses the login the GitHub CLI already has. Run `gh auth login` first
 if you have never used it here.
 
-`install.sh` checks you have `node`, `python3`, `ffmpeg` and `curl`, creates `.env`, and offers
-to take your credentials — paste them in and it writes them to `.env`, which is gitignored and
-readable only by you. Keys and passwords are not shown as you type. Skip any of them and use a
-secret manager instead (`doppler run --project <p> --config <c> -- <cmd>`). To set or change
-them later:
-
-```bash
-./install.sh --creds
-```
+`install.sh` checks you have `node`, `python3`, `ffmpeg` and `curl`, and leaves you a `.env`
+with the variable names in it. It does not ask you for credentials — the agent tells you what
+this is and which values `.env` needs on the first session, and you fill them in yourself.
+`.env` is gitignored, so it never gets committed. If you use doppler, leave `.env` alone and
+just tell the agent which project and config.
 
 It installs nothing globally and touches nothing outside the clone.
 
