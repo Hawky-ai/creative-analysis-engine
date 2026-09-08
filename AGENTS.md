@@ -4,6 +4,25 @@ You are an agent (Claude Code, or any coding agent) that has cloned this repo to
 creative entity extraction and analysis for an ad account. This file is your runbook.
 Read `README.md` for what the system is; read this for how to drive it.
 
+## The guided flow
+
+A fresh clone is driven by an interview, not by guesswork. Opening this repo in Claude Code
+runs `bin/cae-session-start.sh` (SessionStart hook), which reports tool and credential
+readiness and where every brand run is parked, then names the skill to load next.
+
+| Skill | Owns | Invoke |
+|---|---|---|
+| `onboard-brand` | intake interview, workspace, discovery, inventory | `/onboard-brand` |
+| `scout-and-prompt` | scout sample, prompt design, feedback loop, coverage gate | `/scout-and-prompt` |
+| `extract-and-load` | full extraction, verification, warehouse load, facet registry | `/extract-and-load` |
+
+Each run keeps its state in `brands/<name>/run.yaml` (template: `brands/example/run.yaml`).
+Update the step keys as you go — that file is the only thing that survives a lost session, and
+an unrecorded step is a step someone runs twice.
+
+The skills own the *how* for the entity-extraction path. This file stays the reference for the
+whole system, including the analysis and enforcement stages, which are not on the guided path.
+
 ## Ground rules
 
 - **Secrets**: never hardcode or print them. Every command that needs credentials is run

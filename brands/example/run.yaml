@@ -1,0 +1,42 @@
+# Run state for one brand. Created by the onboard-brand skill, updated after every step.
+# The session-start digest reads this to work out where a run is parked, so keep the step
+# keys and their order exactly as written. A step is pending while its value is empty or
+# "todo"; anything else counts as settled.
+brand: example                  # workspace name, matches brands/<name>/
+brand_id: ""                    # warehouse brand id the creatives are read FROM
+created: ""                     # YYYY-MM-DD
+
+secrets:
+  doppler_project: ""
+  doppler_config: ""
+
+scope:
+  media: [video, image]
+  date_from: ""                 # blank = whole account history
+  date_to: ""
+  spend_gate: 0                 # min lifetime spend per creative; 0 = take everything in scope
+  campaign_filter: ""           # optional campaign name/id restriction
+  scout_sample: 15              # creatives read open-endedly before the prompt is written
+
+targets:
+  entities_brand_id: ""         # brand id entities are written TO; differs from brand_id for a test brand
+  register_facets: true         # write the facet list into the brand's Mongo metrics doc
+  load_timeline: true
+
+vertical: ""                    # prompts/<vertical>.txt — named after the CATEGORY, not the brand
+
+steps:
+  discover: todo
+  inventory: todo
+  scout: todo
+  prompt: todo
+  feedback: todo
+  coverage_audit: todo
+  extract: todo
+  timeline: todo
+  verify: todo
+  load_ch: todo
+  register_facets: todo
+  smoke: todo
+
+log: []                         # one line per settled step: "YYYY-MM-DD <step> <what happened>"

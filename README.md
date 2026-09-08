@@ -47,6 +47,8 @@ auditable by a human in seconds.
 | `enforcement/` | `reasoning_v3.mjs` → `validate_insights.py` → `repair_insights.mjs`: LLM insights are checked against stored evidence (proof hashes must exist, quotes must match verbatim); unrepairable ones are dropped |
 | `loaders/` | `load_entities_ch.py` — publish per-creative entities to ClickHouse for downstream consumers (e.g. a copilot's entity path) |
 | `brands/` | Per-brand workspaces (gitignored — data never enters the repo). `brands/example/brand.yaml` is the template |
+| `.agents/skills/` | The guided flow: `onboard-brand`, `scout-and-prompt`, `extract-and-load` (`.claude/skills` symlinks here) |
+| `bin/` | `cae-session-start.sh` (session digest, wired as the SessionStart hook), `cae-discover.sh` (account shape) |
 | `AGENTS.md` | **The runbook.** If you are an agent (Claude Code etc.) operating this repo, start there |
 
 ## Quick start
@@ -54,6 +56,17 @@ auditable by a human in seconds.
 ```bash
 git clone https://github.com/Hawky-ai/creative-analysis-engine && cd creative-analysis-engine
 cp .env.example .env            # or use doppler/vault — never commit values
+claude                          # the agent reads AGENTS.md and interviews you from there
+```
+
+There is nothing to install. The clone is the tool: opening it in a coding agent runs a
+session digest, and with no brand run present the agent loads the `onboard-brand` skill and
+asks for the brand, the scope, the credentials and the focus brief before touching anything.
+Run state lives in `brands/<name>/run.yaml`, so a lost session resumes where it stopped.
+
+To drive it by hand instead:
+
+```bash
 # edit config.yaml if your model ids / gateway differ
 
 # smoke test on a handful of creatives:
