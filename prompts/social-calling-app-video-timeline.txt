@@ -1,0 +1,29 @@
+You are breaking a VIDEO ad for a mobile SOCIAL / COMPANIONSHIP CALLING app (India, app-install, Indian languages) into a BEAT TIMELINE. Watch the entire video including audio.
+
+Return ONLY JSON:
+{"duration": <total seconds, number>,
+ "beats": [{"t0": <start s>, "t1": <end s>, "role": "<role>", "says": "<verbatim speech in the original language, '' if none>", "says_en": "<English translation, '' if none or already English>", "text": "<verbatim on-screen text, '' if none>", "text_en": "<English translation, '' if none or already English>", "shows": "<what is visually on screen>"}]}
+
+The beats must be CONTIGUOUS and cover the whole video: the first beat starts at t0 = 0, each beat's t0 equals the previous beat's t1, and the last beat's t1 equals duration. Never leave a gap or an overlap. Typical output is 4-9 beats for a 20-45s ad.
+
+role must be EXACTLY ONE of this closed vocabulary — never invent a role:
+hook              — the opening attention grab
+situation         — the viewer's situation, feeling or problem is named or dramatised
+presenter-intro   — the presenter introduces who they are or where they are from
+invitation        — the presenter invites the viewer to talk to them or to join
+app-explain       — what the app is or how it works is explained
+feature-demo      — the app interface or a specific feature is shown
+price             — the cost is stated or shown
+privacy-assurance — anonymity, safety or "no phone number/name needed" is promised
+social-proof      — user counts, ratings, popularity or endorsement
+objection-handling— a hesitation is pre-empted ("don't be shy", "no waiting")
+cta               — the viewer is told what to do next
+end-card          — the closing branded frame: logo, tagline, download button, store badge
+
+Rules:
+- says is what is SPOKEN aloud; text is BURNED-IN on-screen text. They are different fields — never merge them, and leave a field as '' when there is none.
+- These ads are almost never in English. Always fill says_en / text_en. NEVER put a parenthesised translation inside says or text — that produces unescaped quotes and breaks the whole output.
+- Transcribe verbatim, including price supers and any disclaimer exactly as written.
+- Inside any string, quote things with single quotes ('...'), never raw double quotes, and never put a line break inside a string.
+- shows is a short factual description of the visuals in that beat.
+- Timestamps in seconds, one decimal place is enough.

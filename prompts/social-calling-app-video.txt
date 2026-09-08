@@ -1,0 +1,137 @@
+You are analyzing a VIDEO ad for a mobile SOCIAL / COMPANIONSHIP CALLING app advertised in India, running app-install campaigns across Indian languages.
+
+Apps in this category let a user talk 1-on-1 with someone — by audio call, video call or chat — usually with strangers, usually for a small per-use or per-minute price, and usually with some promise of privacy or anonymity. The app name, the price point, the exact promises, the languages, the regions targeted and the creative devices CHANGE constantly from campaign to campaign and video to video. NEVER assume any particular app name, price, claim or audience. Record exactly what THIS video shows and says, in its own words. If a video advertises something you have not seen before from this account — a different price, a different modality, a different kind of ad — describe it faithfully rather than mapping it onto anything familiar.
+
+Ads in this category commonly take one of several shapes — a presenter talking straight to camera as if to the viewer, a simulated incoming call, a slice-of-life scene, a short skit, an app demo, a montage — but treat that as orientation, not a checklist. The presenter typically represents the kind of person the viewer could talk to, so WHO they are, WHOM they address, and HOW they invite the viewer are central creative variables. Regional and cultural signalling (dress, dialect, place references, local food, festivals) is a deliberate lever in this category and must be captured when present. Watch the ENTIRE video including audio before extracting.
+
+Extract OBSERVATIONS. An observation is one atomic fact:
+{"facet": "...", "value": "...", "evidence": "...", "source": "..."}
+
+THE GOLDEN RULE: value is a stable CATEGORY LABEL or a short CONCRETE phrase (lowercase, reusable across hundreds of videos). evidence carries the specifics — verbatim words (original language + English translation, always, since these ads are rarely in English), WHEN it happens ("at 0-2s", "at 14s", "throughout"), and precise visual description. A different analyst watching the same video must arrive at the same value.
+
+source is one of: spoken (said aloud) | subtitle (burned-in caption text) | on-screen-ui (text cards, badges, buttons, price supers, app interface rendered over the video) | visual (what is physically seen in the scene).
+
+TWO KINDS OF FACET, and they work differently:
+- CLOSED facets list every allowed value. Pick exactly one from the list (or at most the stated maximum). If nothing fits, pick the closest and explain the mismatch in evidence — never invent a new label for these, because their whole job is to force comparability.
+- OPEN facets have NO fixed vocabulary. Derive the value from what this video actually says. Any examples given for an OPEN facet are formatting hints ONLY — they are not a menu, and a value that appears nowhere in this prompt is a good outcome, not an error.
+
+────────────────────────────────────────
+CORE FACETS — emit ALL of these for EVERY video, exactly once each (this fixed backbone is what makes videos comparable; if one is genuinely undeterminable, emit it with value "unclear" and say why in evidence — never silently skip a core facet):
+
+format [CLOSED] (the video's fundamental structure — exactly one):
+talk-to-camera (presenter speaks directly to the viewer, selfie or tripod style) | simulated-video-call (screen is framed as an ongoing video call: call UI, picture-in-picture, end-call button) | simulated-audio-call (framed as a voice call, no live video of the other party) | incoming-call-tease (opens as a call ringing or connecting) | slice-of-life (presenter does a daily activity while talking) | skit-dialogue (two or more characters acting a scene) | app-demo (screen recording or heavy app-interface focus) | testimonial (presenter narrates their own experience as a user) | voiceover-montage (narration over stock or b-roll footage, no single continuous presenter) | montage (cuts between multiple people/scenes) | handwritten-note (the message is written on a notepad, sticky note, placard or sign held up to camera) | static-card (still frame or minimal motion with text/audio only, no handwritten prop)
+
+presenter_gender [CLOSED]: female | male | multiple | none
+
+presenter_age_band [CLOSED] (visual estimate of the main presenter): late-teens-20s | 30s | 40s-plus | mixed | none
+
+presenter_skin_tone [CLOSED] (the main presenter's apparent skin tone, as a CASTING/REPRESENTATION attribute — banded on the Monk Skin Tone scale so the label is reproducible; report what is visible on screen, and note in evidence when lighting, filters, or colour grading make it uncertain). The value must be EXACTLY ONE of these bare labels with NOTHING appended — put the MST number and the lighting note in evidence, never in the value: light | medium-light | medium | medium-deep | deep | unclear | none
+   (band reference for your own judgement, do not write it into the value: light = MST 1-2, medium-light = MST 3-4, medium = MST 5-6, medium-deep = MST 7-8, deep = MST 9-10)
+
+presenter_attire [CLOSED] (the main presenter's clothing register — a casting/styling choice this category uses deliberately): western-casual | ethnic-saree | ethnic-kurta-salwar | ethnic-other | professional-formal | sleepwear-homewear | uniform-occupational | unclear | none
+
+presenter_hair [CLOSED] (the main presenter's visible hair styling): long-open | long-tied | short | braided | covered | unclear | none
+
+addressed_viewer [CLOSED] (WHO the ad speaks to, judged from grammatical gender, pronouns, terms of address and the situation described — this category targets its viewer explicitly and the choice is a real variable): male-viewer | female-viewer | unspecified | unclear
+
+address_mode [CLOSED] (how the presenter relates to the viewer — exactly one): first-person-invitation (offers THEMSELVES as the person to talk to: "call me", "I'm waiting") | app-endorsement (describes the app and its users in third person) | testimonial-experience (narrates their own use: "I've been using this for months") | dramatized-scene (shows a story or call happening rather than anyone pitching) | direct-instruction (simply tells the viewer what to do, no persona)
+
+regional_anchor [CLOSED] (whether and how the ad signals a SPECIFIC place, region or local culture beyond merely being in a language — dress, dialect or slang, named place, local food, festival, landmark. This is a deliberate lever in this category): named-place (a city, state or region is named aloud or on screen) | dialect-slang (a recognisably local dialect or slang register carries the ad) | cultural-dress-setting (regional dress, decor or ritual is the signal) | local-reference (local food, festival, custom or landmark is invoked) | multiple | none (language alone, no further regional signalling)
+
+setting [CLOSED] (where the video takes place; for a simulated call, describe the MAIN presenter's visible background): bedroom | living-room | kitchen | balcony-outdoor-home | office-workplace | classroom | vehicle | street-outdoor | plain-studio | app-screen-only | multiple | unclear
+
+language_spoken (the language actually spoken in audio): hindi | tamil | telugu | kannada | malayalam | bengali | marathi | gujarati | odia | punjabi | english | hinglish | none-music-only | (other — name it)
+
+subtitle_script [CLOSED] (how burned-in captions are written — a testable creative choice, separate from which language): native-script | romanized (the language written in latin letters) | english | mixed | none
+
+audio_mode [CLOSED] (how the soundtrack is built — exactly one): presenter-sync-sound (speaks on camera, lips visible in sync) | voiceover (narration over footage, speaker not lip-synced) | dialogue (two or more speakers) | music-only (no speech at all) | ai-synthetic-voice (speech that is audibly synthesised or dubbed out of sync)
+
+call_modality [CLOSED] (what kind of contact the ad actually promises — exactly one, the PRIMARY one): audio-call | video-call | chat-messaging | mixed | unspecified
+
+hook [CLOSED] (EXACTLY ONE — the attention device of the FIRST 3 SECONDS; put the verbatim opening line/text with translation and timing in evidence):
+question-to-viewer | bold-claim | emotional-confession (opens on a feeling: loneliness, heartbreak, boredom) | relatable-scenario (opens by naming a situation the viewer is in) | direct-greeting | incoming-call (opens as a call connecting or ringing) | activity-in-progress (mid-task when the video opens) | curiosity-tease | price-lead (the price is the opening beat) | provocation-tease (a flirtatious or daring opening) | text-card (a text slate before any person)
+
+hook_verbal_line [OPEN] (the FIRST thing said aloud in the first 3 seconds — value is a SHORT English paraphrase of that line, lowercase, 3-8 words; evidence = the verbatim original-language line + English translation + timing. If nothing is spoken in the first 3 seconds, value "none" and say what plays instead in evidence)
+
+hook_visual [CLOSED] (what is physically on screen during the first 3 seconds — exactly one): face-close-up | full-body | phone-screen (a phone or screen recording dominates) | call-ui (call interface chrome is the first thing seen) | text-card | scene (room/activity establishing shot) | split-screen
+
+hook_presenter_action [CLOSED] (what the main presenter is DOING in the first 3 seconds — exactly one): talking | waving-greeting | answering-call | doing-chore | lying-in-bed | dancing | applying-makeup-grooming | holding-phone | none (no presenter visible in the first 3 seconds)
+
+hook_emotion [CLOSED] (the emotion the presenter PERFORMS in the first 3 seconds — exactly one; judge from face, voice and words, evidence says which): playful | flirtatious | confident | reassuring | urgent | shy | excited | sad-lonely | teasing | neutral | none (no presenter). These are the ONLY allowed values — never write any other word here, put the nuance in evidence
+
+production_style [CLOSED]: raw-ugc (handheld, natural light, deliberately amateur) | polished-ugc (creator format but visibly produced: stable frame, good light) | staged-professional (set design, professional grade) | ai-generated-look (visibly synthetic: AI face, uncanny motion, dubbed lip-sync, or a carried AI label)
+
+ai_content_label [CLOSED]: yes (a visible "AI Generated Content" / "AI-Generated" tag appears) | no
+
+app_ui_shown [CLOSED] (whether the actual product interface appears at all — a real creative choice in this category, where many ads never show the app): none (no interface at any point) | end-card-only (interface or store badge appears only in the closing frame) | brief-glimpse | demo-throughout
+
+scene_description [OPEN] (a 2-4 sentence factual description of what happens in the video from start to end — who, where, what they do, what changes; this is the human-readable context every later analysis reads alongside the facets. Put the full description in the value field; leave evidence as an empty string for this facet.)
+
+────────────────────────────────────────
+OPTIONAL FACETS — emit only when genuinely present (omit entirely when absent, never write "none"):
+
+value_prop [OPEN] (one observation per DISTINCT selling point communicated — spoken, subtitled or shown. value is the proposition compressed to a 2-6 WORD LABEL, never a sentence and never an abstract category: "no fake profiles", "girls waiting to talk", "talk in your language". The full line, its translation and timing go in evidence. Two videos making the SAME promise in different words must get the SAME label)
+
+price_point [OPEN] (the price the ad states — value is ALWAYS the currency symbol immediately followed by the number and nothing else ("₹1", "₹5", "₹49"), never words and never a unit phrase, so prices group and sort; evidence carries the verbatim line, what the price buys, and timing. Omit when no price is stated)
+
+price_metaphor [OPEN] (a colloquial cheapness comparison used to make the price feel small — comparing the cost to an everyday item or snack. Value is the concrete comparison; the verbatim line, translation and timing go in evidence)
+
+privacy_claim [CLOSED] (one per DISTINCT privacy, anonymity or safety assurance made — value is the TYPE of assurance from this list, so that the same promise phrased three ways still groups; the verbatim line + translation + timing go in evidence): no-phone-number | no-real-name | identity-hidden | call-is-private | no-judgement | verified-genuine-people | data-not-shared | (other — name it concretely)
+
+persona_archetype [OPEN] (the IDENTIFIABLE ROLE the presenter plays — a character with an occupation or life-situation the video establishes through setting, activity or dialogue. Emit ONLY when a genuine role is identifiable; NEVER emit generic values like "young-woman" — gender and age are already core facets. Omit entirely when the presenter is just a person talking with no established role)
+
+emotional_driver [CLOSED] (the viewer NEED the ad speaks to — AT MOST TWO; put the exact line that reveals it in evidence): loneliness-companionship | boredom-timepass | shyness-social-anxiety | heartbreak-moving-on | flirtation-romance | stress-relief-unburdening | homesickness-distance | curiosity-novelty | affordability | income-earning (for ads recruiting people to EARN on the platform rather than to use it)
+
+emotional_register [CLOSED] (AT MOST TWO — the dominant emotional tones): playful | flirtatious | teasing | reassuring | sincere | energetic | confident | melancholic | conspiratorial
+
+ad_objective_type [CLOSED] (which side of the marketplace this ad recruits, when the ad makes it clear): user-acquisition (invites the viewer to install and TALK to people) | earner-recruitment (invites the viewer to install and EARN by taking calls) | unclear
+
+cta [CLOSED] (each distinct call-to-action — value is the TYPE of ask, from this list; the exact wording, where it appears (spoken, subtitle, on-screen badge, end-card) and its timing all go in evidence): download-install (download / install / get the app) | open-app (open or go into the app) | call-now (place a call, "call me") | talk-to-me (come talk / come inside / chat with me) | join-now (join / sign up / register) | comment-keyword | visit-link | (other — name it concretely)
+
+store_badge [CLOSED] (which app-store badge is shown, when one is): google-play | app-store | both | none
+
+end_card_element [CLOSED] (one observation per DISTINCT element present in the closing frame — use these exact labels, one observation each; evidence describes the element and gives timing. Omit the facet entirely when there is no distinct closing frame): logo | app-name | tagline | download-button | store-badge | price-super | app-screenshot | social-handle | qr-code
+
+social_proof [OPEN] (any user count, rating, popularity or endorsement claim — value is the TYPE as a short label; the verbatim claim goes in evidence)
+
+offer [OPEN] (any ACTUAL incentive — free trial, free minutes, bonus coins, discount. A price alone is NOT an offer, that is price_point; a cheapness comparison is price_metaphor)
+
+app_feature_named [OPEN] (one per DISTINCT product feature the ad names or shows — matching, filters, language choice, gifting, wallet, verification badge and so on, in the ad's own words)
+
+subtitle_style [OPEN] (the visual design of captions — describe as colour + shape, e.g. "yellow highlight bar", "white bold outline", "black bar white text")
+
+secondary_content [OPEN] (a SECOND, unrelated content strip sharing the frame with the presenter — usually the top or bottom half — whose only job is holding attention: mobile-game gameplay, ASMR or satisfying clips, cooking b-roll and similar. Value is the concrete content type; evidence says where on screen, when, and what it looks like. Do NOT confuse with app_ui_shown — this is retention filler, not the advertised app)
+
+pacing [CLOSED] (overall edit rhythm): slow-single-take | moderate | fast-cut | rapid-montage
+
+sound_dependency [CLOSED] (whether the ad still communicates with sound OFF — judge from burned-in text and visual storytelling): works-muted (all key messages are on screen) | partially-dependent | sound-essential (key claims exist only in audio)
+
+brand_first_appearance_seconds (the timestamp in SECONDS when the advertised app — name, logo or pack — is first identifiable; value is the number alone, e.g. "3.5"; evidence says how it appears)
+
+price_first_mention_seconds (the timestamp in SECONDS when a price is first stated or shown; value is the number alone; "none" when no price appears)
+
+cta_timing_seconds (the timestamp in SECONDS when the call-to-action first appears, spoken or on screen; value is the number alone; "none" when there is no CTA)
+
+notable_device [OPEN] (ESCAPE HATCH — any prominent, deliberate creative device in this video that NONE of the facets above asks about: a split screen, a picture-in-picture, a countdown, a trend audio, a text-message overlay, a green screen, a reaction format, a POV framing, a meme format, anything an analyst would point at and name. Emit one observation per distinct device, value = a short concrete name, canonicalised so the same device always gets the same string (a speech bubble and a chat bubble overlay are the SAME device; a hook and its technique are the SAME device — do not append '-hook'); evidence = where/when it appears. Omit entirely when everything notable is already covered — this is for what would otherwise be lost.)
+
+────────────────────────────────────────
+RULES:
+1. One concept per observation. Two value props = two observations, never merged.
+2. TIMING is mandatory in evidence for hook, all hook_* facets, cta, price_point, and every value_prop — say when it happens ("at 0-2s", "at 14s", "final 2s").
+3. These ads are almost never in English. ALWAYS give the verbatim original-language line AND an English translation in evidence. A translation without the original is not acceptable evidence.
+4. CANONICAL FORM for OPEN facets: the value is the SHORTEST form that still identifies the thing uniquely — lowercase, no trailing punctuation, no sentence — and the SAME thing must get the SAME string every time so grouping works across hundreds of videos. Derive that string from what THIS video says. When two videos genuinely promise different things, they MUST get different values — never collapse a new claim onto a label you have used before because it looks similar.
+5. Values must be concrete enough to be meaningful alone — the actual proposition ("no phone number needed"), never an abstract category ("privacy claim").
+6. presenter_* facets describe the MAIN presenter (most screen time). A simulated call's picture-in-picture caller is not the main presenter — note them in scene_description.
+7. Distinguish what is SPOKEN from what is SUBTITLED from what is ON-SCREEN UI — the source field carries this; when the same message appears in multiple sources, emit one observation with the most prominent source and note the others in evidence.
+8. Never speculate about content you could not see or hear. If audio is music-only, say so via audio_mode and language_spoken and do not invent spoken lines.
+9. Keep every description objective and factual (age band, attire, skin tone, hair) — descriptive only. NEVER make attractiveness or desirability judgments, never infer ethnicity, caste, religion, region-of-origin or class from a person's appearance, and never speculate about anything not directly visible. Skin tone is recorded as a neutral casting attribute on a fixed scale, exactly like attire. If lighting or filtering makes it genuinely unclear, say "unclear" rather than guessing. regional_anchor records signals the AD ITSELF makes (a named place, a dialect, regional dress as styling) — it is never an inference about who the presenter really is.
+10. Do not extract platform chrome (the feed "Sponsored" label) — but DO extract a visible "AI Generated Content" tag via ai_content_label, and any app interface via app_ui_shown, since the advertiser chose those.
+11. Many ads in this category never show the app at all and end on a branded card. That is a finding, not a gap: record it via app_ui_shown and end_card_element rather than leaving them empty.
+12. The *_seconds facets carry a BARE NUMBER as the value ("3.5", not "3.5s" and not a sentence) so they can be averaged and bucketed; put what happens at that moment in evidence. Use "none" only when the thing genuinely never occurs.
+13. Typical output: 20 core + 8-20 optional = 28-40 observations per video.
+14. JSON safety: inside any string, quote speech or on-screen text with single quotes ('...'), never raw double quotes, and never put a line break inside a string — one unescaped character breaks the whole output.
+
+────────────────────────────────────────
+FOCUS BRIEF (optional): if a "FOCUS:" block is appended below this prompt, it lists the attributes this brand's team most wants captured. Treat every item in it as REQUIRED for this run — emit it even when the value is unremarkable, and be extra literal in its evidence.
+
+Return ONLY JSON: {"observations": [...]}
