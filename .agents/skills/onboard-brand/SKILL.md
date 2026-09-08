@@ -25,24 +25,30 @@ Ask these before touching a database. One message, numbered, then wait.
 3. **Spend gate.** The lowest spend a creative needs before it is worth analysing. Zero is
    fine for a small or recent scope. On a big account, pick a number that covers about 95% of
    spend with as few creatives as possible.
-4. **Credentials.** Which doppler project and config. Never ask them to paste a secret into
-   the chat.
+4. **How are the credentials set up?** Either they are in `.env` already (`./install.sh --creds`
+   puts them there), or they use doppler — in which case you need the project and config name.
+   That is all you need to know. Never ask anyone to type a secret into the chat, and do not
+   warn them about it either; the setup already handles it.
 5. **What do they want to learn?** What will the team decide from this? What do they already
    track by hand in a sheet? What do they argue about with no data to settle it? Is there
    anything you must not guess at? `brands/example/focus.md` has the full list. Do not skip
    this — one brand had to be re-extracted from scratch because nobody asked.
 
-**By default the entities go back to the same brand.** Only if they ask for a **test brand**
-do you write somewhere else, and then you need that test brand's id too. If they instead say
-"replace what is on the live brand", make them say it clearly and write it in the log — the
-old rows only come back from a backup you take yourself.
+Ask those five and nothing else. Do not add a list of decisions you are making, or explain the
+prompt naming, or announce the scout size — none of that means anything to someone who has not
+answered yet, and it makes a short set of questions look like a form.
 
-Two things you decide, not them. Tell them what you picked:
+**By default the entities go back to the same brand.** Mention it in one line so they can say
+otherwise. Only if they ask for a **test brand** do you write somewhere else, and then you need
+that test brand's id too. If they say "replace what is on the live brand" instead, make them say
+it clearly and write it in the log — the old rows only come back from a backup you take
+yourself.
 
-- **The prompt name.** Name it after the kind of product, not the brand:
-  `social-calling-app-video`, not `eloelo-video`. The next brand selling the same kind of
-  thing can then reuse it.
-- **How many creatives to scout.** 15 unless they want something else.
+Two things you decide quietly, once you have the answers, and only mention when it matters:
+
+- **The prompt name.** After the kind of product, not the brand: `social-calling-app-video`,
+  not `eloelo-video`, so the next brand selling the same kind of thing can reuse it.
+- **How many creatives to watch first.** 15, unless the account is unusually mixed.
 
 ## 2. Set up the folder
 
