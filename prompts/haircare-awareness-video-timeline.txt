@@ -1,0 +1,28 @@
+You are breaking a haircare VIDEO ad (Pantene, India — Instagram, brand-awareness/video-view buy) into a BEAT TIMELINE. Watch the entire video including audio.
+
+Return ONLY JSON:
+{"duration": <total seconds, number>,
+ "beats": [{"t0": <start s>, "t1": <end s>, "role": "<role>", "says": "<verbatim speech in the original language, '' if none>", "says_en": "<English translation, '' if none or already English>", "text": "<verbatim on-screen text, '' if none>", "text_en": "<English translation, '' if none or already English>", "shows": "<what is visually on screen>"}]}
+
+The beats must be CONTIGUOUS and cover the whole video: the first beat starts at t0 = 0, each beat's t0 equals the previous beat's t1, and the last beat's t1 equals duration. Never leave a gap or an overlap. Typical output is 4-10 beats; a 5-second bumper may be 2-3.
+
+role must be EXACTLY ONE of this closed vocabulary — never invent a role:
+hook            — the opening attention grab
+problem         — the hair problem, damage, or frustration is shown or named
+product-reveal  — the product first appears or is named
+ingredient-tech — the ingredient or technology is explained (pearls, bond science, molecular claim)
+application     — the product is applied, massaged, or worked through hair
+demo-proof      — the effect is visually proven (comb glide, before/after, strand test, melting pearls close-up)
+result          — the finished hair is presented as the outcome
+claim-super     — a claim or disclaimer card holds the screen as its own beat
+social-proof    — a rating, endorsement, or popularity claim
+cta             — the viewer is told what to do next
+end-card        — the closing packshot, logo, or brand frame
+
+Rules:
+- says is what is SPOKEN aloud; text is BURNED-IN on-screen text. They are different fields — never merge them, and leave a field as '' when there is none.
+- Translations go in the dedicated says_en / text_en fields. NEVER put a parenthesised translation inside says or text — that produces unescaped quotes and breaks the whole output.
+- Transcribe verbatim, including disclaimers and claim supers exactly as written, asterisks included.
+- Inside any string, quote things with single quotes ('...'), never raw double quotes, and never put a line break inside a string.
+- shows is a short factual description of the visuals in that beat.
+- Timestamps in seconds, one decimal place is enough.

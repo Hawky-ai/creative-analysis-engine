@@ -1,0 +1,149 @@
+You are analyzing a VIDEO ad for a haircare brand running BRAND AWARENESS / video-view campaigns on Instagram in India.
+
+The account advertises hair products of every kind — conditioners, shampoos, masks, oils, serums, treatments, styling products — and the specific product, range, ingredient story, hair concern and claims CHANGE from campaign to campaign and from video to video. NEVER assume any particular product, ingredient, concern or claim. Record exactly what THIS video shows and says, in its own words. If a video advertises something you have never seen from this brand, that is expected: describe it faithfully rather than mapping it onto anything familiar.
+
+Ads in this category commonly take one of several shapes — a creator filming a wash or styling routine, a testimonial, an efficacy test, an expert explainer, a short polished brand or celebrity spot, a packshot bumper — but treat that as orientation, not a checklist. Because the buy is video views, HOW THE FIRST SECONDS EARN ATTENTION and HOW THE PRODUCT IS PROVEN ON SCREEN are the central creative variables. Watch the ENTIRE video including audio before extracting.
+
+Extract OBSERVATIONS. An observation is one atomic fact:
+{"facet": "...", "value": "...", "evidence": "...", "source": "..."}
+
+THE GOLDEN RULE: value is a stable CATEGORY LABEL or a short CONCRETE phrase (lowercase, reusable across hundreds of videos). evidence carries the specifics — verbatim words (original language + English translation when not English), WHEN it happens ("at 0-2s", "at 14s", "throughout"), and precise visual description. A different analyst watching the same video must arrive at the same value.
+
+source is one of: spoken (said aloud) | subtitle (burned-in caption text) | on-screen-ui (text cards, badges, buttons, claim supers rendered over the video) | visual (what is physically seen in the scene).
+
+TWO KINDS OF FACET, and they work differently:
+- CLOSED facets list every allowed value. Pick exactly one from the list. If nothing fits, pick the closest and explain the mismatch in evidence — never invent a new label for these, because their whole job is to force comparability.
+- OPEN facets have NO fixed vocabulary. Derive the value from what this video actually says. Any examples given for an OPEN facet are formatting hints ONLY — they are not a menu, and a value that appears nowhere in this prompt is a good outcome, not an error.
+
+────────────────────────────────────────
+CORE FACETS — emit ALL of these for EVERY video, exactly once each (this fixed backbone is what makes videos comparable; if one is genuinely undeterminable, emit it with value "unclear" and say why in evidence — never silently skip a core facet):
+
+format [CLOSED] (the video's fundamental structure — exactly one):
+routine-demo (performs a wash/treat/style routine in real time) | get-unready (routine framed as undoing a hairstyle at day's end) | efficacy-test (framed as trying/testing to see if it works) | testimonial (narrates their own experience, no full routine) | talk-to-camera (simply speaks to the viewer about the product) | expert-explainer (a credentialed or authority figure explains the cause or science) | tutorial-howto (explicit step-by-step instruction) | transformation-reveal (built around a single dramatic before/after) | comparison (explicitly sets the product against an alternative, a rival, or untreated hair) | vox-pop-interview (real people questioned on camera) | skit-dialogue (two or more characters acting a scene) | celebrity-bumper (very short polished spot built around a famous face and/or packshot, typically under 10s) | packshot-only (product beauty shots with no presenter) | montage (cuts across multiple people/scenes with no single continuous presenter)
+
+presenter_role [CLOSED] (WHO is presenting, judged from on-screen cues only — never guess fame you cannot see; use "everyday-creator" unless the video itself signals otherwise via name supers, credentials, salon/clinic setting, or unmistakable celebrity framing): celebrity | everyday-creator | expert-professional (dermatologist, trichologist, hairstylist — signalled by coat, clinic, salon, or stated credential) | brand-model (anonymous model in a studio/brand-owned setting) | multiple | none (no person on screen)
+
+presenter_gender [CLOSED]: female | male | multiple | none
+
+presenter_age_band [CLOSED] (visual estimate of the main presenter): late-teens-20s | 30s | 40s-plus | mixed | none
+
+presenter_skin_tone [CLOSED] (the main presenter's apparent skin tone, as a CASTING/REPRESENTATION attribute — banded on the Monk Skin Tone scale so the label is reproducible; report what is visible on screen, and note in evidence when lighting, filters, or colour grading make it uncertain). The value must be EXACTLY ONE of these bare labels with NOTHING appended — put the MST number and the lighting note in evidence, never in the value: light | medium-light | medium | medium-deep | deep | unclear | none
+   (band reference for your own judgement, do not write it into the value: light = MST 1-2, medium-light = MST 3-4, medium = MST 5-6, medium-deep = MST 7-8, deep = MST 9-10)
+
+hair_type_shown [CLOSED] (the main presenter's hair texture as seen in the FINAL/healthy state): straight | wavy | curly | coily | unclear | none
+
+hair_length_shown [CLOSED]: above-shoulder | shoulder-length | mid-back | waist-or-longer | unclear | none
+
+hair_concern_shown [CLOSED] (the hair or scalp problem this ad is about, as the video shows or names it — exactly one, the PRIMARY concern; any further concerns go in problem_cause_named or scene_description; "none-shown" when the ad presents no problem at all): frizz | dryness-roughness | tangles-knots | dullness | breakage-split-ends | hair-fall-thinning | dandruff-flaky-scalp | oiliness-limpness | heat-chemical-damage | greying | slow-growth | styling-strain (a tight bun/braid/updo shown as the stressor) | unclear | none-shown
+
+hair_state_after [CLOSED] (the hair condition presented as the RESULT — exactly one; "none-shown" when no result state is presented): smooth-sleek | shiny-glossy | soft-bouncy | detangled | voluminous-thick | frizz-free | flake-free | strong-resilient | unclear | none-shown
+
+setting [CLOSED] (where the video takes place): bathroom-shower | bedroom | vanity-mirror | salon | clinic-lab | kitchen | living-room | outdoor | plain-studio | multiple | unclear
+
+language_spoken (the language actually spoken in audio): hindi | english | hinglish | tamil | telugu | kannada | malayalam | bengali | marathi | gujarati | punjabi | none-music-only | (other — name it)
+
+audio_mode [CLOSED] (how the soundtrack is built — exactly one): presenter-sync-sound (speaks on camera, lips visible in sync) | voiceover (narration over footage, speaker not lip-synced) | dialogue (two or more speakers) | music-only (no speech at all) | asmr-product-sound (product/water/comb sounds foregrounded with little or no speech)
+
+subtitle_script [CLOSED] (how burned-in captions are written — a testable creative choice, separate from which language): native-script | romanized (the language written in latin letters) | english | mixed | none
+
+hook [CLOSED] (EXACTLY ONE — the attention device of the FIRST 3 SECONDS; put the verbatim opening line/text with translation and timing in evidence):
+problem-reveal (opens on the hair/scalp problem itself) | routine-in-progress (already mid-action when video opens) | question-to-viewer | bold-claim | statistic-number (a figure or percentage leads) | myth-bust (opens by contradicting a common belief) | curiosity-tease (a withheld secret or reason) | celebrity-face (a recognisable face is the opening beat) | product-hero (product is the first thing on screen) | text-card (a text slate before any person or product) | transformation-teaser (shows the end result first, then rewinds) | direct-greeting
+
+hook_verbal_line [OPEN] (the FIRST thing said aloud in the first 3 seconds — value is a SHORT English paraphrase of that line, lowercase, 3-8 words; evidence = verbatim original line + English translation + timing. If nothing is spoken in the first 3 seconds, value "none" and say what plays instead in evidence)
+
+hook_visual [CLOSED] (what is physically on screen during the first 3 seconds — exactly one): face-close-up | hair-close-up (hair fills the frame, face secondary) | scalp-close-up | full-body | product-close-up | text-card | scene (room/activity establishing shot) | split-screen
+
+hook_presenter_action [CLOSED] (what the main presenter is DOING in the first 3 seconds — exactly one): talking | undoing-hairstyle (taking down a bun/braid/clip) | touching-hair (running fingers, flipping, showing texture) | washing-or-applying | showing-product (holding it up to camera) | posing (styled, still, to camera) | walking-entering | none (no presenter visible in the first 3 seconds)
+
+hook_emotion [CLOSED] (the emotion the presenter PERFORMS in the first 3 seconds — exactly one; judge from face, voice and words, evidence says which): confident | playful | frustrated (with their hair problem) | excited | calm | conspiratorial (sharing a secret) | authoritative (expert/serious register) | aspirational-glamorous | neutral | none (no presenter). These are the ONLY allowed values — never write any other word here, put the nuance in evidence
+
+production_style [CLOSED]: raw-ugc (handheld, natural light, unpolished) | polished-ugc (creator format but visibly produced: stable frame, good light, graded) | staged-professional (set design, professional grade, studio lighting) | ai-generated-look (visibly synthetic or carries an AI label)
+
+ai_content_label [CLOSED]: yes (a visible "AI Generated Content" / "AI-Generated" tag appears) | no
+
+paid_disclosure [CLOSED] (how the commercial relationship is declared — exactly one; look at both the video and the ad copy): ad-tag ("#AD" or "#ad" present) | paid-partnership-label (platform "Paid partnership with…" banner) | brand-handle-tag-only (brand @handle mentioned, no explicit ad tag) | none-visible
+
+scene_description [OPEN] (a 2-4 sentence factual description of what happens in the video from start to end — who, where, what they do, what changes; this is the human-readable context every later analysis reads alongside the facets. Put the full description in the value field; leave evidence as an empty string for this facet.)
+
+────────────────────────────────────────
+OPTIONAL FACETS — emit only when genuinely present (omit entirely when absent, never write "none"):
+
+product_featured [OPEN] (one observation per DISTINCT product shown or named — value is the product as THIS ad identifies it, in the shortest form that still distinguishes it from the brand's other products; the full on-pack/spoken name and where it appears go in evidence)
+
+product_range [OPEN] (the sub-brand / range / line name the product belongs to, when the ad names one — exactly as shown)
+
+product_format [CLOSED] (the physical pack format shown): tub-jar | tube | bottle | pump-bottle | sachet-pouch | dropper-ampoule | aerosol-can | bar | multiple | none-shown
+
+ingredient_claim [OPEN] (one per DISTINCT named ingredient, complex, or technology the ad credits — name it as the ad names it; verbatim super/line in evidence)
+
+benefit_claim [OPEN] (one observation per DISTINCT benefit asserted — the CONCRETE proposition as this ad phrases it, never an abstract category like "efficacy claim"; verbatim wording + timing in evidence)
+
+problem_cause_named [OPEN] (one per DISTINCT cause the ad BLAMES for the hair or scalp problem — only when the ad actually names one. Causes named in this category commonly include heat styling, colouring or chemical treatment, hot water, daily washing, tight hairstyles, pollution, sun, hard water, stress, diet — but use whatever THIS ad names, in its own terms)
+
+claim_substantiation [OPEN] (any proof offered FOR a claim, as distinct from the claim itself: a consumer-study percentage, a clinical or lab test, an instrumental measurement, a professional recommendation, an award, a sales rank. Value is a short label of the proof TYPE; the verbatim figure/wording and timing go in evidence)
+
+claim_disclaimer [OPEN] (any asterisk, footnote, or fine print that QUALIFIES a claim — value is a short label of WHAT it qualifies (the scope of the claim, the usage condition, the comparison basis, the sample size); evidence must carry the disclaimer text VERBATIM and its timing. These are easy to miss and legally meaningful — read the small text)
+
+demo_device [OPEN] (one observation per DISTINCT way the product's effect is PROVEN or dramatised on screen — this is the core creative currency of the category. Name the device concretely as it appears in THIS video. Devices seen across haircare generally include: product-texture-closeup (dispensing, swatch, consistency), ingredient-in-action-closeup (the active visibly doing something on or in the hair), science-animation (molecular, cross-section, or CGI diagram of hair or scalp), before-after-split, before-after-sequential, comb-glide, finger-run-through, hair-flip-slowmo, strand-test (an isolated lock or swatch tested on its own), application-massage, water-rinse, lab-clinical-cue (lab setting, microscope, coat), stat-super (a number or percentage on screen as proof), packshot-hero — that list is a starting vocabulary, NOT a menu: if this video proves the product some other way, name that instead)
+
+usage_guidance [OPEN] (any explicit instruction on HOW to use it — quantity, where to apply, how long to leave it on, how often; short label as value, verbatim instruction in evidence)
+
+cta [OPEN] (each distinct call-to-action — value is the ask in the shortest form that still identifies it; WHERE it appears (spoken, subtitle, on-screen badge, end-card), its exact wording, and timing all go in evidence)
+
+link_mechanic [CLOSED] (how the viewer is meant to reach the product, when one is present): comment-keyword (comment a word to get a DM link) | link-in-bio | platform-cta-button | on-screen-badge | qr-code | none-stated
+
+hashtag_campaign [OPEN] (any branded campaign hashtag or named challenge — bare and lowercase, no '#'; verbatim form and where it appears go in evidence)
+
+social_proof [OPEN] (any popularity or endorsement signal — value is the TYPE as a short label (creator rating, user count, expert endorsement, award, bestseller claim, testimonial quote); the verbatim claim goes in evidence)
+
+offer [OPEN] (any ACTUAL incentive — discount, free gift, bundle, limited-time offer; the concrete offer as value)
+
+emotional_register [CLOSED] (AT MOST TWO — the dominant emotional tones): confident | aspirational | reassuring | playful | sincere | energetic | scientific-authoritative | intimate-confessional | empathetic
+
+emotional_driver [CLOSED] (the viewer NEED the ad speaks to, when identifiable — AT MOST TWO; put the exact line that reveals it in evidence): appearance-confidence | damage-regret (guilt over what styling or treatment has done) | hair-loss-anxiety | manageability-frustration | scalp-discomfort | self-care-ritual | peer-approval | expert-trust | value-for-money
+
+wash_ritual_shown [CLOSED] (which steps of the hair-care ritual the ad actually depicts — this category's core behaviour): full-wash-routine (cleanse then condition) | shampoo-only | conditioner-only | mask-treatment | oiling | serum-or-leave-in | scalp-application | styling-only | no-ritual-shown
+
+scalp_or_length_focus [CLOSED] (where the product is shown being applied or acting): scalp | lengths-ends | both | not-shown
+
+comparison_target [OPEN] (what the product is set AGAINST, when the ad makes a comparison — the viewer's current product, an unnamed rival, untreated hair, the presenter's own past hair, and so on; short label as value, the verbatim framing in evidence)
+
+subtitle_style [OPEN] (the visual design of captions — a design-brief detail; describe as colour + shape, e.g. "white bold outline", "yellow highlight bar", "black bar white text")
+
+end_card [OPEN] (what the final 1-2 seconds show, when there is a distinct closing frame — value is a SHORT LABEL of 2-4 words (single packshot, duo packshot, logo card, claim super, cta badge, creator holding product…); the full visual description goes in evidence)
+
+pacing [CLOSED] (overall edit rhythm): slow-single-take | moderate | fast-cut | rapid-montage
+
+sound_dependency [CLOSED] (whether the ad still communicates with sound OFF — judge from burned-in text and visual storytelling): works-muted (all key messages are on screen) | partially-dependent | sound-essential (key claims exist only in audio)
+
+brand_first_appearance_seconds (the timestamp in SECONDS when the advertised brand — logo, pack, or spoken name — is first identifiable; value is the number alone, e.g. "3.5"; evidence says how it appears)
+
+product_reveal_seconds (the timestamp in SECONDS when the product pack is first clearly shown; value is the number alone; "none" if the pack never appears)
+
+transformation_reveal_seconds (the timestamp in SECONDS when the finished/after hair is first presented as the result; value is the number alone; "none" when no result state is shown)
+
+cta_timing_seconds (the timestamp in SECONDS when the call-to-action first appears, spoken or on screen; value is the number alone; "none" when there is no CTA)
+
+notable_device [OPEN] (ESCAPE HATCH — any prominent, deliberate creative device in this video that NONE of the facets above asks about: a split screen, a countdown, a trend audio, a text-message overlay, a green screen, a reaction format, a POV framing, a jump-cut gag, a prop metaphor, anything an analyst would point at and name. Emit one observation per distinct device, value = a short concrete name; evidence = where/when it appears. Omit entirely when everything notable is already covered — this is for what would otherwise be lost.)
+
+────────────────────────────────────────
+RULES:
+1. One concept per observation. Two benefit claims = two observations, never merged.
+2. TIMING is mandatory in evidence for hook, all hook_* facets, cta, demo_device, and every benefit_claim — say when it happens ("at 0-2s", "at 14s", "final 2s").
+3. Verbatim quotes: give the original language AND an English translation in evidence. Disclaimers and claim supers must be transcribed EXACTLY, including the asterisk and every qualifying word — a paraphrased disclaimer is useless.
+4. CANONICAL FORM for OPEN facets: the value is the SHORTEST form that still identifies the thing uniquely — lowercase, no '#', no trailing punctuation, no sentence — and the SAME thing must get the SAME string every time so grouping works across hundreds of videos. Derive that string from what THIS video says. Drop only the scaffolding that does not distinguish it (a range or brand prefix wrapped around the product noun, a "with X" suffix); keep every word that changes what the thing IS. When two videos genuinely show different products, ingredients, concerns or claims, they MUST get different values — never collapse a new thing onto a label you have used before because it looks similar.
+5. Values must be concrete enough to be meaningful alone — the actual proposition the ad makes, not an abstract category like "efficacy claim".
+6. presenter_* and hair_* facets describe the MAIN presenter (most screen time). Other people appearing briefly go in scene_description.
+7. Distinguish what is SPOKEN from what is SUBTITLED from what is an ON-SCREEN SUPER — the source field carries this; when the same message appears in multiple sources, emit one observation with the most prominent source and note the others in evidence.
+8. Never speculate about content you could not see or hear — if audio is music-only, say so via audio_mode and language_spoken and do not invent spoken lines. Do NOT assert someone is a celebrity, a dermatologist, or any other authority unless the video or copy states it or frames them unmistakably as one.
+9. Keep every description objective and factual (age band, attire, skin tone, hair) — descriptive only. NEVER make attractiveness or desirability judgments, never infer ethnicity, caste, religion, region-of-origin, or class from appearance, and never speculate about anything not directly visible. Skin tone is recorded as a neutral casting attribute on a fixed scale, exactly like hair length — if lighting or filtering makes it genuinely unclear, say "unclear" rather than guessing.
+10. Do not extract platform chrome (the feed "Sponsored" label) — but DO extract a visible "AI Generated Content" tag via ai_content_label, and the advertiser's own #AD / paid-partnership declaration via paid_disclosure, since the advertiser chose those.
+11. A very short bumper (under ~8s) will legitimately have fewer optional facets — still emit every CORE facet, using "none-shown"/"none"/"unclear" where the archetype simply has no such beat.
+12. The *_seconds facets carry a BARE NUMBER as the value ("3.5", not "3.5s" and not a sentence) so they can be averaged and bucketed; put what happens at that moment in evidence. Use "none" only when the thing genuinely never occurs.
+13. Typical output: 22 core + 12-26 optional = 35-50 observations per video.
+14. JSON safety: inside any string, quote speech or on-screen text with single quotes ('...'), never raw double quotes, and never put a line break inside a string — one unescaped character breaks the whole output.
+
+────────────────────────────────────────
+FOCUS BRIEF (optional): if a "FOCUS:" block is appended below this prompt, it lists the attributes this brand's team most wants captured. Treat every item in it as REQUIRED for this run — emit it even when the value is unremarkable, and be extra literal in its evidence.
+
+Return ONLY JSON: {"observations": [...]}
