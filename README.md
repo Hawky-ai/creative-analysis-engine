@@ -15,13 +15,18 @@ calling apps. The backtest on the strongest account held on 6/6 launch-date cuto
 ## Quick start
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Hawky-ai/creative-analysis-engine/main/install.sh | sh
-cd creative-analysis-engine && claude
+gh repo clone Hawky-ai/creative-analysis-engine
+cd creative-analysis-engine && ./install.sh && claude
 ```
 
-`install.sh` clones the repo, checks the toolchain (`node`, `python3`, `ffmpeg`, `curl`) and
-seeds `.env`. It installs nothing globally, touches nothing outside the clone, and re-running it
-just updates an existing clone. Cloning by hand does the same job.
+This repo is **private**, so it cannot be piped from `raw.githubusercontent.com` — that returns
+a 404 for anyone without a token, which reads as "file missing" rather than "not authorized".
+`gh repo clone` reuses the credentials the GitHub CLI already holds; `gh auth login` first if
+you have never used it here.
+
+`install.sh` checks the toolchain (`node`, `python3`, `ffmpeg`, `curl`) and seeds `.env`. It
+installs nothing globally, touches nothing outside the clone, and re-running it later updates
+the clone in place.
 
 Launching a coding agent inside the clone is the whole interface. There is no CLI to learn and
 no config to fill in first: the agent reads `AGENTS.md`, runs a session digest, and with no
