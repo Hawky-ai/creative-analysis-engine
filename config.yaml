@@ -19,14 +19,14 @@ bifrost:
 
 extraction:
   # Image model id AS THE PROXY KNOWS IT (proxy-prefixed).
-  image_model: gemini/gemini-2.5-flash
-  image_concurrency: 6
+  image_model: gemini/gemini-3.8-flash
+  image_concurrency: 12
   request_timeout_ms: 120000      # per-request abort; a stalled socket otherwise hangs a slot forever
 
   # Video model id AS THE GENAI ENDPOINT KNOWS IT (bare, no proxy prefix).
-  video_model: gemini-2.5-flash
-  video_concurrency: 10
-  video_timeout_ms: 240000        # videos are slower; keep well under the gateway's own cap
+  video_model: gemini-3.8-flash
+  video_concurrency: 32
+  video_timeout_ms: 420000        # videos are slower; larger creatives + inline upload need headroom
 
 # LLM used by the reasoning + repair stages (enforcement/), OpenAI-schema via llm_proxy.
 reasoning:

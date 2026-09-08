@@ -2,13 +2,15 @@
 // Usage: node scripts/extract_timeline_vid.mjs <input.jsonl> <output.json> <prompt.txt>
 // Expects the model to return {"duration": n, "beats": [...]}. Resumes via <output>.progress.jsonl.
 import fs from "fs";
-const S = "/private/tmp/claude-501/-Users-apple-work-meta/e76840e7-1662-4b18-a477-b25558c46351/scratchpad/phase0";
+import { inlinePart } from "./media-inline.mjs";
+import path from "path";
+import { CONFIG } from "./config.mjs";
 const [,, INPUT, OUTPUT, PROMPTFILE] = process.argv;
 const GBASE = process.env.BIFROST_GENAI_BASE_URL.replace(/\/$/, "");
 const MODEL = "gemini-2.5-flash";
-const CONCURRENCY = 10;
-const PROMPT = fs.readFileSync(S + "/" + PROMPTFILE, "utf8");
-const PROGRESS = S + "/" + OUTPUT + ".progress.jsonl";
+const CONCURRENCY = CONFIG.extraction.video_concurrency;
+const PROMPT = fs.readFileSync(path.resolve(PROMPTFILE), "utf8");
+const PROGRESS = path.resolve(OUTPUT) + ".progress.jsonl";
 const usage = { calls: 0, prompt_tokens: 0, completion_tokens: 0, errors: 0, bad_json: 0 };
 
 function validate(tl) {
@@ -24,15 +26,17 @@ function validate(tl) {
 }
 
 async function callLLM(item) {
-  const payload = {
+  let payload = null;
+  const buildPayload = async () => ({
     contents: [{ role: "user", parts: [
       { text: PROMPT },
-      { fileData: { mimeType: "video/mp4", fileUri: item.u } },
+      await inlinePart(item.u),
     ]}],
     generationConfig: { temperature: 0, maxOutputTokens: 65536, responseMimeType: "application/json" },
-  };
+  });
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
+      if (!payload) payload = await buildPayload();
       const r = await fetch(GBASE + "/models/" + MODEL + ":generateContent", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-bf-vk": process.env.BIFROST_API_KEY },
@@ -71,7 +75,7 @@ if (fs.existsSync(PROGRESS)) {
   }
   console.log("resuming:", done.size, "done");
 }
-const rows = fs.readFileSync(S + "/" + INPUT, "utf8").trim().split("\n").map(JSON.parse).filter(r => !done.has(r.hash));
+const rows = fs.readFileSync(path.resolve(INPUT), "utf8").trim().split("\n").map(JSON.parse).filter(r => !done.has(r.hash));
 console.log("timeline for", rows.length, "videos ->", OUTPUT);
 const t0 = Date.now();
 const fresh = await mapLimit(rows, CONCURRENCY, async (item, idx) => {
@@ -81,6 +85,6 @@ const fresh = await mapLimit(rows, CONCURRENCY, async (item, idx) => {
   process.stdout.write((idx % 20 === 19) ? (idx + 1) + " " : ".");
   return rec;
 });
-fs.writeFileSync(S + "/" + OUTPUT, JSON.stringify([...done.values(), ...fresh], null, 1));
+fs.writeFileSync(path.resolve(OUTPUT), JSON.stringify([...done.values(), ...fresh], null, 1));
 console.log("\ndone", Math.round((Date.now() - t0) / 1000) + "s");
 console.log("usage:", JSON.stringify(usage));

@@ -5,6 +5,7 @@
 // Progress is checkpointed to <output>.progress.jsonl — rerunning the same command RESUMES
 // from where it stopped (survives crashes/stalls). Model + endpoint from config.yaml.
 import fs from "fs";
+import { inlinePart } from "./media-inline.mjs";
 import { CONFIG, env } from "./config.mjs";
 
 const [,, INPUT, OUTPUT, PROMPTFILE, SKIPFILE] = process.argv;
@@ -34,15 +35,17 @@ function adCopyText(raw) {
 }
 
 async function callLLM(item) {
-  const payload = {
+  let payload = null;
+  const buildPayload = async () => ({
     contents: [{ role: "user", parts: [
       { text: PROMPT + "\n\nAD COPY:\n" + adCopyText(item.ad_copy) },
-      { fileData: { mimeType: "video/mp4", fileUri: item.u } },
+      await inlinePart(item.u),
     ]}],
     generationConfig: { temperature: 0, maxOutputTokens: 65536, responseMimeType: "application/json" },
-  };
+  });
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
+      if (!payload) payload = await buildPayload();
       const r = await fetch(GBASE + "/models/" + MODEL + ":generateContent", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-bf-vk": GKEY },

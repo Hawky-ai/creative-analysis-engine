@@ -4,6 +4,7 @@
 //   skip.json (optional): JSON array of hashes already extracted (resume/delta runs)
 // Model + endpoint + concurrency come from config.yaml; secrets from env (see .env.example).
 import fs from "fs";
+import { inlineDataUri } from "./media-inline.mjs";
 import { CONFIG, env } from "./config.mjs";
 
 const [,, INPUT, OUTPUT, PROMPTFILE, SKIPFILE] = process.argv;
@@ -35,16 +36,18 @@ function adCopyText(raw) {
 }
 
 async function callLLM(item) {
-  const body = {
+  let body = null;
+  const buildBody = async () => ({
     model: MODEL, temperature: 0,
     response_format: { type: "json_object" },
     messages: [{ role: "user", content: [
       { type: "text", text: PROMPT + "\n\nAD COPY:\n" + adCopyText(item.ad_copy) },
-      { type: "image_url", image_url: { url: item.u } },
+      { type: "image_url", image_url: { url: await inlineDataUri(item.u) } },
     ]}],
-  };
+  });
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
+      if (!body) body = await buildBody();
       const r = await fetch(BASE + "/chat/completions", {
         method: "POST",
         headers: { Authorization: "Bearer " + KEY, "Content-Type": "application/json" },
