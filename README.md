@@ -49,9 +49,19 @@ auditable by a human in seconds.
 | `brands/` | Per-brand workspaces (gitignored — data never enters the repo). `brands/example/brand.yaml` is the template |
 | `.agents/skills/` | The guided flow: `onboard-brand`, `scout-and-prompt`, `extract-and-load` (`.claude/skills` symlinks here) |
 | `bin/` | `cae-session-start.sh` (session digest, wired as the SessionStart hook), `cae-discover.sh` (account shape) |
+| `install.sh` | One-command install: clone, toolchain check, `.env` seed |
 | `AGENTS.md` | **The runbook.** If you are an agent (Claude Code etc.) operating this repo, start there |
 
 ## Quick start
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Hawky-ai/creative-analysis-engine/main/install.sh | sh
+cd creative-analysis-engine && claude
+```
+
+`install.sh` clones the repo, checks the toolchain (`node`, `python3`, `ffmpeg`, `curl`) and
+seeds `.env`. It installs nothing globally and touches nothing outside the clone; re-running it
+updates an existing clone. Or clone by hand — it is the same thing:
 
 ```bash
 git clone https://github.com/Hawky-ai/creative-analysis-engine && cd creative-analysis-engine
