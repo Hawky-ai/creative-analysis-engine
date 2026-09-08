@@ -25,9 +25,29 @@ This repo is **private**, so you cannot pipe it from `raw.githubusercontent.com`
 logged in. `gh repo clone` uses the login the GitHub CLI already has. Run `gh auth login` first
 if you have never used it here.
 
-`install.sh` checks you have `node`, `python3`, `ffmpeg` and `curl`, and creates `.env`. It
-installs nothing globally and touches nothing outside the clone. Run it again later and it just
-updates the clone.
+`install.sh` checks you have `node`, `python3`, `ffmpeg` and `curl`, creates `.env`, and offers
+to take your credentials — paste them in and it writes them to `.env`, which is gitignored and
+readable only by you. Keys and passwords are not shown as you type. Skip any of them and use a
+secret manager instead (`doppler run --project <p> --config <c> -- <cmd>`). To set or change
+them later:
+
+```bash
+./install.sh --creds
+```
+
+It installs nothing globally and touches nothing outside the clone.
+
+## Updating
+
+From inside the folder:
+
+```bash
+./install.sh
+```
+
+It pulls the latest and re-checks your tools. If the clone has lost its `origin` remote —
+`git pull` failing with *"'origin' does not appear to be a git repository"* — it puts the remote
+back rather than leaving you to work out what broke.
 
 Opening a coding agent inside the clone is the whole interface. Nothing to learn, no config to
 fill in first: the agent reads `AGENTS.md`, prints what it can see, and if there is no run yet
