@@ -19,6 +19,29 @@ DEVICE_WORDS = [
     "voiceover", "animation", "cartoon", "screenshot", "collage", "grid",
 ]
 
+# Some device words are ambiguous: "blur" means a deliberate censor/privacy blur (a real
+# device) but also ordinary background bokeh (not a device at all). Flagging the latter makes
+# the gate cry wolf, and a gate that cries wolf gets ignored. When an ambiguous word appears
+# ONLY in an innocuous context, it is not counted.
+AMBIGUOUS_CONTEXT = {
+    "blur": ("blurred background", "blurry background", "softly blurred", "blurred outdoor",
+             "blurred garden", "blurred residential", "blurred indoor", "background is blurred"),
+}
+
+def is_incidental(word, prose):
+    ctx = AMBIGUOUS_CONTEXT.get(word)
+    if not ctx:
+        return False
+    # every occurrence must sit inside one of the innocuous phrases
+    idx, total, innocuous = 0, 0, 0
+    while (i := prose.find(word, idx)) != -1:
+        total += 1
+        window = prose[max(0, i - 30):i + 30]
+        if any(c in window for c in ctx):
+            innocuous += 1
+        idx = i + len(word)
+    return total > 0 and innocuous == total
+
 hits = Counter(); examples = {}
 facet_values = set()
 for path in sys.argv[1:]:
@@ -28,12 +51,15 @@ for path in sys.argv[1:]:
             continue
         prose = ""
         for o in obs:
+            # a malformed observation must not crash the gate — skip it
+            if not isinstance(o, dict) or "facet" not in o or "value" not in o:
+                continue
             if o["facet"] == "scene_description":
                 prose = str(o["value"]).lower()
             else:
                 facet_values.add(str(o["value"]).lower())
         for w in DEVICE_WORDS:
-            if w in prose:
+            if w in prose and not is_incidental(w, prose):
                 hits[w] += 1
                 examples.setdefault(w, prose[max(0, prose.find(w) - 60):prose.find(w) + 80])
 

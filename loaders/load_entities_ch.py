@@ -50,9 +50,14 @@ records = [r for r in json.load(open(a.obs_json)) if isinstance(r.get("obs"), li
 
 grouped_by_hash = {}
 multi = set()
+skipped_malformed = 0
 for r in records:
     grouped = defaultdict(list)
     for o in r["obs"]:
+        # a malformed observation must not abort the whole load
+        if not isinstance(o, dict) or "facet" not in o or "value" not in o:
+            skipped_malformed += 1
+            continue
         v = str(o["value"]).strip().lower()
         v = canon.get(o["facet"], {}).get(v, v)
         if v and v not in grouped[o["facet"]]:
@@ -72,7 +77,7 @@ for r in records:
     ent["_observations"] = [
         {"facet": o["facet"], "value": str(o["value"]), "evidence": str(o.get("evidence", ""))[:600],
          "source": o.get("source", "")}
-        for o in r["obs"] if o.get("evidence")
+        for o in r["obs"] if isinstance(o, dict) and o.get("evidence") and "facet" in o and "value" in o
     ]
     if key(r) in timelines:
         ent["_timeline"] = timelines[key(r)]
