@@ -52,8 +52,20 @@ if [ -z "$(git remote 2>/dev/null)" ]; then
   git remote add origin "$REPO"
 fi
 
+before=$(git rev-parse HEAD 2>/dev/null || echo none)
+
 git pull --ff-only 2>/dev/null || git pull --ff-only origin main || \
   say "Could not update automatically - pull by hand, or check 'gh auth status'."
+
+# The pull can rewrite this very script while /bin/sh is still reading it, which makes the rest
+# of the run a mix of old and new code - it will happily print prompts that were deleted. So if
+# the pull changed anything, start the new version over from the top. CAE_REEXEC stops a loop.
+after=$(git rev-parse HEAD 2>/dev/null || echo none)
+if [ "$before" != "$after" ] && [ "${CAE_REEXEC:-0}" != 1 ] && [ -f "$0" ]; then
+  say "Updated - restarting the installer"
+  CAE_REEXEC=1; export CAE_REEXEC
+  exec sh "$0" "$@"
+fi
 
 # --- tools ------------------------------------------------------------------
 
