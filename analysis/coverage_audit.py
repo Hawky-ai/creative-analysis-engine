@@ -63,9 +63,16 @@ for path in sys.argv[1:]:
                 hits[w] += 1
                 examples.setdefault(w, prose[max(0, prose.find(w) - 60):prose.find(w) + 80])
 
+# "split screen" in prose and "split-screen" as a facet value are the same device. Compare with
+# separators flattened, or a facet that genuinely covers the device still reads as uncovered.
+def _norm(t):
+    return t.replace("-", " ").replace("_", " ")
+
+_normalised_values = {_norm(v) for v in facet_values}
+
 flagged = []
 for w, n in hits.most_common():
-    covered = any(w.rstrip("s") in v for v in facet_values)
+    covered = any(_norm(w).rstrip("s") in v for v in _normalised_values)
     if n >= 3 and not covered:
         flagged.append((w, n))
         print(f"UNCOVERED  {w!r}  in {n} videos' prose, in NO facet value")
