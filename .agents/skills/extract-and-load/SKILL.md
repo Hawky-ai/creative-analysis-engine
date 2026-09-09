@@ -78,6 +78,34 @@ Say you are about to write before you do — this is a shared table. Then:
 - Never write `'X' AS brand_id` in an `INSERT ... SELECT`. The alias hides the `WHERE` on the
   same column and you insert nothing.
 
+## 4b. Writing to a test brand
+
+Sometimes the results should not land on the live brand yet. `extracted_entities_v2` is shared,
+and the moment you load, that brand's Copilot starts answering from what you loaded. A test
+brand is where you put the output so someone can look at it first.
+
+It is only a write-target swap. Discovery, the creative list, the media and the extraction all
+still read the REAL brand. Only the last two commands take the test brand id: the entity load
+and the facet registration.
+
+The operator creates the brand. What you have to check before loading:
+
+- **Does the test brand have a Mongo metrics doc?** A brand created by hand does not, and
+  `set_copilot_entities.py` stops there. Pass `--from-brand <real_brand_id>` and it clones the
+  source brand's doc, with the attribute list emptied so the UI does not offer attributes this
+  run never extracted.
+- **Do the hashes line up with `ad_metadata_v3`?** Entity rows are keyed by hash and join to ad
+  rows by it. If the test brand has no ad rows, or its rows were built separately and carry
+  `md5(url)[:16]` surrogates while the real brand has real content hashes, the load succeeds and
+  then every query returns nothing, because the join matches no ads. Check the overlap with a
+  count BEFORE loading, not after.
+- **Does the test brand have ad rows at all?** The UI reads ads, not entities. Entities alone
+  give you a brand that looks empty. The ad rows have to be copied to the test brand id too —
+  this repo does not do that; it is a warehouse copy the operator runs.
+
+The frontend's Status filter reads `meta_ads.ad_metrics_daily`, not `ad_metadata_v3`, so a test
+brand with only `ad_metadata_v3` rows shows nothing under Status.
+
 ## 5. Register the facets
 
 The UI reads the list of attributes from the brand's Mongo metrics document and nowhere else.
@@ -90,7 +118,8 @@ step lands at the very end of a run, and finding the credential missing then mea
 extraction is already paid for.
 
 ```
-MONGO_URI=... .venv/bin/python3 loaders/set_copilot_entities.py <target_brand_id> prompts/facets/<vertical>.json --media video
+MONGO_URI=... .venv/bin/python3 loaders/set_copilot_entities.py <target_brand_id> prompts/facets/<vertical>.json \
+    --media Video --obs brands/<name>/raw/obs_all.json [--from-brand <real_brand_id>]
 ```
 
 Two mistakes that both look like "the feature is broken":
