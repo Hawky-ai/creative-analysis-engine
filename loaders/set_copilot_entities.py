@@ -40,7 +40,13 @@ facets = [k for k in json.load(open(a.facets_json)) if not k.startswith("_")]
 values = defaultdict(set)
 if a.obs:
     for r in json.load(open(a.obs)):
-        for o in r.get("obs") or []:
+        # a creative the model refused leaves obs as an {"error": ...} dict, not a list;
+        # iterating that yields strings and used to abort the whole registration
+        if not isinstance(r.get("obs"), list):
+            continue
+        for o in r["obs"]:
+            if not isinstance(o, dict) or "facet" not in o or "value" not in o:
+                continue
             if o["facet"] in facets and o["facet"] != "scene_description":
                 values[o["facet"]].add(str(o["value"]).strip().lower())
 
