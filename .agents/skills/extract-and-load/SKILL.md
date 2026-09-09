@@ -60,7 +60,7 @@ leave two different schemas in one table.
 ## 4. Load
 
 ```
-doppler run ... -- python3 loaders/load_entities_ch.py brands/<name>/raw/obs_all.json <target_brand_id> \
+doppler run ... -- .venv/bin/python3 loaders/load_entities_ch.py brands/<name>/raw/obs_all.json <target_brand_id> \
     --aliases prompts/aliases/<vertical>.json --timeline brands/<name>/raw/tl.json
 ```
 
@@ -83,8 +83,14 @@ Say you are about to write before you do — this is a shared table. Then:
 The UI reads the list of attributes from the brand's Mongo metrics document and nowhere else.
 A facet that is not registered is invisible no matter how well it loaded.
 
+This needs `MONGO_URI` (and `MONGO_DB_NAME`, default `test`) — see `.env.example`. Through a
+tunnel it points at the LOCAL end, with `replicaSet` removed and `directConnection=true` added,
+because a single forwarded port cannot see a replica set. Check it before you get here: this
+step lands at the very end of a run, and finding the credential missing then means the whole
+extraction is already paid for.
+
 ```
-MONGO_URI=... python3 loaders/set_copilot_entities.py <target_brand_id> prompts/facets/<vertical>.json --media video
+MONGO_URI=... .venv/bin/python3 loaders/set_copilot_entities.py <target_brand_id> prompts/facets/<vertical>.json --media video
 ```
 
 Two mistakes that both look like "the feature is broken":

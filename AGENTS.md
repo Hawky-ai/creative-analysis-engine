@@ -102,7 +102,7 @@ Verify: 0 errors, average observations/creative in the prompt's stated range, fa
 coverage table looks sane (core facets ≈ 100%). Then run the coverage audit — it is a
 GATE, not a suggestion:
 ```
-python3 analysis/coverage_audit.py brands/<name>/raw/obs*.json
+.venv/bin/python3 analysis/coverage_audit.py brands/<name>/raw/obs*.json
 ```
 It flags creative devices that recur in scene_description prose but exist in no facet
 value (exit 1). Each flag = a missing facet: fix the prompt and re-extract before the
@@ -112,7 +112,7 @@ slot for — this audit would have caught it on round one.
 ### 4b. Video beat timeline (separate call — do NOT bundle with entities)
 ```
 doppler run ... -- node extraction/extract_timeline_vid.mjs videos.jsonl tl.json prompts/<vertical>-timeline.txt
-python3 analysis/timeline_analysis.py     # joins beats to Meta's video_p25/p50/p75/p100 quartiles
+.venv/bin/python3 analysis/timeline_analysis.py     # joins beats to Meta's video_p25/p50/p75/p100 quartiles
 ```
 Returns `{duration, beats:[{t0,t1,role,says,says_en,text,text_en,shows}]}` — a contiguous
 0→end breakdown with a fixed `role` vocabulary (hook/problem/introduce-app/value-prop/demo/
@@ -131,13 +131,13 @@ with top-N value caps — one-shot dictionary calls 504 at scale.
 
 ### 6. Analyze
 ```
-python3 analysis/patterns.py brands/<name> --kpi <conversions_field>   # cohorts + CIs + verdicts
-python3 analysis/discriminative.py brands/<name>                       # top-vs-bottom tiers
-python3 analysis/engine_v3.py brands/<name>                            # causal within/between campaign
-python3 analysis/recipes.py brands/<name>                              # winning combinations
-python3 analysis/backtest_strict_launch.py brands/<name>               # honesty gate — run it
-python3 analysis/trend_lifecycle.py brands/<name>                      # month-by-month drift
-python3 analysis/tail_hunt.py brands/<name>                            # cheap-in-small-tests, unscaled
+.venv/bin/python3 analysis/patterns.py brands/<name> --kpi <conversions_field>   # cohorts + CIs + verdicts
+.venv/bin/python3 analysis/discriminative.py brands/<name>                       # top-vs-bottom tiers
+.venv/bin/python3 analysis/engine_v3.py brands/<name>                            # causal within/between campaign
+.venv/bin/python3 analysis/recipes.py brands/<name>                              # winning combinations
+.venv/bin/python3 analysis/backtest_strict_launch.py brands/<name>               # honesty gate — run it
+.venv/bin/python3 analysis/trend_lifecycle.py brands/<name>                      # month-by-month drift
+.venv/bin/python3 analysis/tail_hunt.py brands/<name>                            # cheap-in-small-tests, unscaled
 ```
 (Some stages expect `raw/daily.jsonl`, `raw/ctx_dim.jsonl`, `raw/campaign_context.json` —
 see each script's header for its input contract.)
@@ -145,9 +145,9 @@ see each script's header for its input contract.)
 ### 7. Reasoning + enforcement (LLM writes insights, validator keeps it honest)
 ```
 doppler run ... -- node enforcement/reasoning_v3.mjs brands/<name>
-python3 enforcement/validate_insights.py brands/<name>      # proof hashes must exist; quotes verbatim-matched
+.venv/bin/python3 enforcement/validate_insights.py brands/<name>      # proof hashes must exist; quotes verbatim-matched
 doppler run ... -- node enforcement/repair_insights.mjs brands/<name>
-python3 enforcement/validate_insights.py brands/<name>      # re-validate; DROP what cannot be repaired
+.venv/bin/python3 enforcement/validate_insights.py brands/<name>      # re-validate; DROP what cannot be repaired
 ```
 Raw LLM insight generations fabricate evidence ~30–60% of the time. Never ship an
 insight that failed validation.
@@ -157,7 +157,7 @@ Build a review page for humans (thumbnails + per-creative observations with evid
 see `explorers/`), collect feedback, fold it into the prompt (yes, this loops back to
 step 3). When approved, load entities for downstream consumers:
 ```
-doppler run ... -- python3 loaders/load_entities_ch.py brands/<name>/raw/obs.json <brand_id> \
+doppler run ... -- .venv/bin/python3 loaders/load_entities_ch.py brands/<name>/raw/obs.json <brand_id> \
     --aliases prompts/aliases/<vertical>.json --timeline brands/<name>/raw/tl.json
 ```
 Writes one row per hash: scalar facets as strings, multi-value facets as arrays,
@@ -168,7 +168,7 @@ Copilot's group-by / ranking paths explode array-valued attributes (copilot PR
 `creative-entities-v2`); `view` returns the full row including `_observations`/`_timeline`.
 1. **Register the facets** so the agent knows they exist — Copilot reads attribute names
    from the brand's Mongo `metrics.tags` doc, nothing else:
-   `MONGO_URI=... python3 loaders/set_copilot_entities.py <brand_id> prompts/facets/<vertical>.json --media video`
+   `MONGO_URI=... .venv/bin/python3 loaders/set_copilot_entities.py <brand_id> prompts/facets/<vertical>.json --media video`
    Keep `prompts/facets/<vertical>.json` in sync with the prompt (one-line meaning per facet).
 2. **Install the brand skill** — upload `copilot/skills/creative_entities_analysis.md` to the
    brand's vault at `skills/` (`POST /api/v1/vault/<brand_id>/upload`, `folder_path=skills`).

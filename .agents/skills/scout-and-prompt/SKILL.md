@@ -87,7 +87,7 @@ Repeat until a round finds nothing. Two or three rounds is normal.
 ## 4. Coverage check — this one blocks
 
 ```
-python3 analysis/coverage_audit.py brands/<name>/raw/scout_obs.json
+.venv/bin/python3 analysis/coverage_audit.py brands/<name>/raw/scout_obs.json
 ```
 
 It looks for things that keep showing up in the written descriptions but have no facet, and
