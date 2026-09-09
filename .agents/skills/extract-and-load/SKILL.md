@@ -100,8 +100,16 @@ The operator creates the brand. What you have to check before loading:
   then every query returns nothing, because the join matches no ads. Check the overlap with a
   count BEFORE loading, not after.
 - **Does the test brand have ad rows at all?** The UI reads ads, not entities. Entities alone
-  give you a brand that looks empty. The ad rows have to be copied to the test brand id too —
-  this repo does not do that; it is a warehouse copy the operator runs.
+  give you a brand that looks empty. Copy the ad rows across first:
+
+  ```
+  .venv/bin/python3 loaders/migrate_ads_ch.py <real_brand> <test_brand> <from> <to> --validate
+  .venv/bin/python3 loaders/migrate_ads_ch.py <real_brand> <test_brand> <from> <to> --load
+  ```
+
+  Run `--validate` on a period already migrated before trusting `--load`: it diffs what the
+  script would write against rows already in ClickHouse. The metrics arrive from Meta as
+  `[{action_type, value}]` lists and are stored flattened, so a wrong mapping is silent.
 
 The frontend's Status filter reads `meta_ads.ad_metrics_daily`, not `ad_metadata_v3`, so a test
 brand with only `ad_metadata_v3` rows shows nothing under Status.
