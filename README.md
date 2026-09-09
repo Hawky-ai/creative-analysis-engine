@@ -122,6 +122,7 @@ Keep it separate — putting it in the same prompt made both worse and cost 5x t
 | `bin/` | `cae-session-start.sh` (readiness + where each run is parked), `cae-discover.sh` (account shape from the warehouse) |
 | `config.yaml` | Models, endpoints (as env-var names), concurrency, timeouts, analysis defaults — the only file to edit when switching gateways/models |
 | `.env.example` | Every env var the engine needs; inject via your secret manager |
+| `requirements.txt` | Python deps (`pymongo`, `numpy`); `install.sh` puts them in `.venv` |
 | `prompts/` | The extraction prompt library, one per vertical + `PROMPT_DESIGN.md` (the methodology — read before writing any new prompt) |
 | `extraction/` | `extract_images.mjs` (OpenAI-schema proxy), `extract_videos.mjs` and `extract_timeline_vid.mjs` (GenAI schema, auto-resume), `media-inline.mjs` (fetch → downscale → inline bytes) |
 | `analysis/` | `coverage_audit.py` (the check that blocks) plus the number-crunching stages: `patterns.py`, `discriminative.py`, `engine_v3.py`, `recipes.py`, `backtest_strict_launch.py`, `trend_lifecycle.py`, `tail_hunt.py`, `matched_pairs.py`, `first3s.py`, `fatigue.py` |

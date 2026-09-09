@@ -90,6 +90,24 @@ if ! have gh; then
   say "repo is private, so updates do:  brew install gh && gh auth login"
 fi
 
+# --- python deps --------------------------------------------------------------
+
+# macOS system python refuses `pip install` under PEP 668, so the deps go in a venv inside the
+# clone. The loaders import pymongo and numpy; without them the load step dies at the very end,
+# after the extraction has already been paid for.
+if [ -f requirements.txt ] && have python3; then
+  if [ ! -x .venv/bin/python3 ]; then
+    say "Creating .venv for the python dependencies"
+    python3 -m venv .venv 2>/dev/null || say "  could not create .venv - install pymongo and numpy yourself"
+  fi
+  if [ -x .venv/bin/pip ]; then
+    .venv/bin/pip install --quiet --upgrade pip >/dev/null 2>&1
+    .venv/bin/pip install --quiet -r requirements.txt >/dev/null 2>&1 \
+      && say "Python dependencies ready (.venv)" \
+      || say "Python dependency install failed - run: .venv/bin/pip install -r requirements.txt"
+  fi
+fi
+
 # --- .env ---------------------------------------------------------------------
 
 if [ ! -f .env ]; then
@@ -104,3 +122,5 @@ if [ "$DIR" = "." ]; then say "    claude"; else say "    cd $DIR && claude"; fi
 say ""
 say "It will tell you what this is, show you which values .env needs, and ask which brand"
 say "to analyse. Any other coding agent works too - point it at AGENTS.md."
+say ""
+say "Python scripts run through the venv:  .venv/bin/python3 loaders/...  (node needs nothing)"

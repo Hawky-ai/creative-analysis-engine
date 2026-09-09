@@ -80,11 +80,7 @@ secondary_content (a SECOND, unrelated content strip sharing the frame with the 
 
 end_card (what the final 1-2 seconds show, when there is a distinct closing frame: app logo, install button, phone mockup): describe concretely
 
-screen_layout (CLOSED — how the frame itself is divided, for the whole video or most of it): single-frame (one continuous shot filling the frame) | split-screen (frame divided into two stacked or side-by-side panels showing different content) | picture-in-picture (a smaller inset panel over a full-frame background) | grid (three or more panels at once). Always emit exactly one.
-
-simulated_ui_overlay (a fake interface element pasted onto the video so it reads as something that happened on a phone — a social-media comment or reply, a chat or DM thread, a search bar, an incoming-call screen, a notification, a keyboard. Emit one observation per distinct element; value names the element concretely, e.g. "comment reply" | "chat thread" | "incoming call screen" | "search bar"; evidence says where it sits, when it appears, and quotes any text inside it. This is a device drawn ON the video — not the advertised app's own interface, which is app_ui_shown.)
-
-notable_device (ESCAPE HATCH — any prominent, deliberate creative device in this video that NONE of the facets above asks about: a countdown, a poll sticker, a green-screen background, a reaction format, a filter, anything an analyst would point at and name. Emit one observation per distinct device, value = a short concrete name for the device; evidence = where/when it appears. NEVER put here anything another facet already covers — screen layout goes to screen_layout, a fake interface goes to simulated_ui_overlay, an AI-content tag goes to ai_content_label, a plain burned-in caption goes to subtitle_style, a retention filler strip goes to secondary_content. Omit entirely when everything notable is already covered — this is only for what would otherwise be lost.)
+notable_device (ESCAPE HATCH — any prominent, deliberate creative device in this video that NONE of the facets above asks about: a split screen, a picture-in-picture, a game overlay, a countdown, a poll sticker, a green-screen background, a reaction format, anything an analyst would point at and name. Emit one observation per distinct device, value = a short concrete name for the device; evidence = where/when it appears. Omit entirely when everything notable is already covered by other facets — this is for what would otherwise be lost.)
 
 ────────────────────────────────────────
 FOCUS BRIEF (optional): if a "FOCUS:" block is appended below this prompt, it lists the attributes this brand's team most wants captured. Treat every item in it as REQUIRED for this run — emit it even when the value is unremarkable, and be extra literal in its evidence.
@@ -98,8 +94,8 @@ RULES:
 6. Distinguish what is SPOKEN from what is SUBTITLED from what is UI — the source field carries this; when the same message appears in multiple sources, one observation with the most prominent source and note the others in evidence.
 7. Never speculate about content you could not see or hear — if audio is silent or music-only, say so via language_spoken and do not invent spoken lines.
 8. Keep every description objective and factual (age band, attire, skin tone, hair, setting) — descriptive only. NEVER make attractiveness or desirability judgments, never infer ethnicity, caste, religion, region-of-origin, or class from appearance, and never speculate about anything not directly visible. Skin tone is recorded as a neutral casting attribute on a fixed scale, exactly like attire or hair — if lighting or filtering makes it genuinely unclear, say "unclear" rather than guessing.
-9. Do not extract platform chrome (the "AD" placement label) — but DO extract a visible "AI Generated Content" tag via ai_content_label, and in-app UI elements via app_ui_shown, since the advertiser chose those. Each device belongs to exactly ONE facet: never record the same thing twice under a second facet or under notable_device.
-10. Typical output: 18 core + 3-8 optional = 21-26 observations per video.
+9. Do not extract platform chrome (the "AD" placement label) — but DO extract a visible "AI Generated Content" tag via ai_content_label, and in-app UI elements via app_ui_shown, since the advertiser chose those.
+10. Typical output: 17 core + 3-8 optional = 20-25 observations per video.
 11. JSON safety: inside any string, quote speech or on-screen text with single quotes ('...'), never raw double quotes, and never put a line break inside a string — one unescaped character breaks the whole output.
 
 Return ONLY JSON: {"observations": [...]}

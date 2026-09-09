@@ -23,6 +23,11 @@ not record is a step someone runs twice.
 By default the entities go back to the same brand. Only write to a **test brand** when the
 operator asks for one.
 
+Python runs through the clone's venv — `.venv/bin/python3 loaders/...`, not bare `python3`.
+`install.sh` creates it; `requirements.txt` lists what is in it. Node needs nothing.
+Credentials come from `.env` (see `.env.example`) or a secret manager. Through a tunnel,
+`CLICKHOUSE_HTTP` and `MONGO_URI` point at the LOCAL end of it, never the internal address.
+
 The skills cover the extraction path. This file is the reference for everything, including the
 analysis and enforcement stages, which are not in the skills.
 

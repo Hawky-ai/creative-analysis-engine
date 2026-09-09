@@ -1,0 +1,5 @@
+# Python dependencies for the loaders and the analysis stages.
+# Install into a venv in the clone:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+# (macOS system python refuses a plain `pip install` under PEP 668, hence the venv.)
+pymongo>=4.6        # loaders/set_copilot_entities.py; also provides bson
+numpy>=1.24         # analysis/ statistics
