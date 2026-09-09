@@ -7,7 +7,7 @@ import path from "path";
 import { CONFIG } from "./config.mjs";
 const [,, INPUT, OUTPUT, PROMPTFILE] = process.argv;
 const GBASE = process.env.BIFROST_GENAI_BASE_URL.replace(/\/$/, "");
-const MODEL = "gemini-2.5-flash";
+const MODEL = CONFIG.extraction.video_model;
 const CONCURRENCY = CONFIG.extraction.video_concurrency;
 const PROMPT = fs.readFileSync(path.resolve(PROMPTFILE), "utf8");
 const PROGRESS = path.resolve(OUTPUT) + ".progress.jsonl";
