@@ -1,12 +1,19 @@
 # Python dependencies for the loaders and the analysis stages.
 # Install into a venv in the clone:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 # (macOS system python refuses a plain `pip install` under PEP 668, hence the venv.)
-pymongo>=4.6                  # loaders/set_copilot_entities.py; also provides bson
-numpy>=1.24                   # analysis/ statistics
 
-# loaders/media_hash.py - the creative hash must match the analysis service's, so these are the
-# same libraries it hashes with. Swapping them changes the hash and breaks the warehouse join.
-ImageHash>=4.3                # phash (images) and average_hash (video frames)
-opencv-python-headless>=4.9   # frame sampling; headless build - no GUI libs needed
-pillow>=10                    # image decoding for ImageHash
-requests>=2.31                # media download
+pymongo>=4.6                      # loaders/set_copilot_entities.py; also provides bson
+
+# ── loaders/media_hash.py ──────────────────────────────────────────────────────────────
+# PINNED, and pinned to the SAME versions as meta/analysis-service/requirements.txt.
+# The creative hash is the warehouse join key, and it is a function of these libraries:
+# imagehash decides phash/average_hash, opencv decides which frames get sampled and how they
+# decode, pillow decides the pixels handed to imagehash. A version drift here does not error -
+# it silently produces a different hash for the same creative, and every entity keyed on the
+# old value stops joining. Bump these only together with the analysis service, and re-hash a
+# known creative to confirm the value is unchanged.
+ImageHash==4.3.2
+opencv-python-headless==4.11.0.86
+pillow==12.2.0
+requests==2.34.2
+numpy==2.4.6                      # also used by analysis/ statistics
