@@ -7,3 +7,11 @@ __pycache__/
 *.pyc
 .DS_Store
 .venv/
+
+# Brand-specific extraction prompts stay local — they are brand IP, not framework.
+prompts/*-video.txt
+prompts/*-video-timeline.txt
+prompts/*-banner.txt
+prompts/facets/
+prompts/aliases/
+!prompts/PROMPT_DESIGN.md
