@@ -30,13 +30,35 @@ ap.add_argument("brand_id")
 ap.add_argument("--aliases", help="JSON {facet: [alias, ...]} — publish facet under extra names")
 ap.add_argument("--timeline", help="beat timeline JSON from extract_timeline_vid.mjs")
 ap.add_argument("--dict", help="JSON {facet: {surface value: canonical value}} from the dictionary pass — merges synonyms before load")
-ap.add_argument("--hash-from-url", action="store_true",
-                help="key rows by md5(url)[:16] — matches accounts whose ad_metadata_v3.hash was synthesised from url")
+ap.add_argument("--hash-from-media", action="store_true",
+                help="compute the key from the media itself with loaders/media_hash.py, instead of "
+                     "trusting the inventory's hash field. Use when the inventory was built from a "
+                     "source that carries no real hash.")
 ap.add_argument("--dry-run", action="store_true")
 a = ap.parse_args()
 
+_media_hash_cache = {}
+
 def key(r):
-    return hashlib.md5(r["url"].encode()).hexdigest()[:16] if a.hash_from_url else r["hash"]
+    """The row's join key.
+
+    Default: whatever hash the inventory carries, which came from the warehouse and is already
+    the analysis service's content hash. --hash-from-media recomputes it from the media with the
+    same algorithm the service uses, for inventories built from a source that has no hash.
+
+    NEVER derive a key from the url string. It joins against rows written by the same mistake
+    and orphans them all once the real pipeline hashes the same creative.
+    """
+    if not a.hash_from_media:
+        return r["hash"]
+    url = r["url"]
+    if url not in _media_hash_cache:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from media_hash import hash_url
+        media = r.get("media_type") or ("image" if url.split("?")[0].lower().endswith(
+            (".jpg", ".jpeg", ".png", ".webp", ".gif")) else "video")
+        _media_hash_cache[url] = hash_url(url, media)[0]
+    return _media_hash_cache[url]
 
 aliases = json.load(open(a.aliases)) if a.aliases else {}
 canon = json.load(open(a.dict)) if a.dict else {}

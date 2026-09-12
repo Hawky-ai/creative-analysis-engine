@@ -11,9 +11,19 @@ for the target brand:
 Usage:
   python3 loaders/sync_rejected_ads.py <source_brand_id> <target_brand_id> <staged_dir> [--account-map src=dst,...]
   env: CLICKHOUSE_URL, CLICKHOUSE_USER, CLICKHOUSE_PASSWORD
-hash = md5(url)[:16] (the convention used when the target brand's ad_metadata_v3 was synthesised).
+hash comes from loaders/media_hash.py - the analysis service's own content hash - so these rows
+join the same way every other row does. Never derive a key from the url string.
 """
 import json, os, sys, glob, hashlib, argparse, urllib.request, urllib.parse, base64, datetime as dt
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from media_hash import hash_url
+
+_hcache = {}
+def media_hash_for(url, media_type):
+    """The analysis service's content hash for this media. One download per url."""
+    if url not in _hcache:
+        _hcache[url] = hash_url(url, media_type)[0]
+    return _hcache[url]
 
 def ch_dt(iso):
     if not iso: return "1970-01-01 00:00:00"
@@ -48,7 +58,13 @@ for r in rej:
     d = staged.get(r["ad_id"], {})
     creative = d.get("creative") or {}
     url = creative.get("url") or ""
-    h = hashlib.md5(url.encode()).hexdigest()[:16] if url else ""
+    media = d.get("media_type") or creative.get("type") or "video"
+    try:
+        h = media_hash_for(url, media) if url else ""
+    except Exception as e:
+        # a wrong hash joins to nothing months later; no hash at least shows up as missing
+        print(f"  ! unhashable, hash left empty: {str(e)[:60]}  {url[:70]}")
+        h = ""
     reason = " | ".join(r["rejection_reasons"]) if r["rejection_reasons"] else ""
     message = " | ".join(r["rejection_messages"]) if r.get("rejection_messages") else ""
     pf = {"rejection_status": r["effective_status"], "rejection_reason": reason, "rejection_message": message}

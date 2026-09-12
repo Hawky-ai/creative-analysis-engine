@@ -127,7 +127,7 @@ Keep it separate — putting it in the same prompt made both worse and cost 5x t
 | `extraction/` | `extract_images.mjs` (OpenAI-schema proxy), `extract_videos.mjs` and `extract_timeline_vid.mjs` (GenAI schema, auto-resume), `media-inline.mjs` (fetch → downscale → inline bytes) |
 | `analysis/` | `coverage_audit.py` (the check that blocks) plus the number-crunching stages: `patterns.py`, `discriminative.py`, `engine_v3.py`, `recipes.py`, `backtest_strict_launch.py`, `trend_lifecycle.py`, `tail_hunt.py`, `matched_pairs.py`, `first3s.py`, `fatigue.py` |
 | `enforcement/` | `reasoning_v3.mjs` → `validate_insights.py` → `repair_insights.mjs`: LLM insights are checked against stored evidence (proof hashes must exist, quotes must match verbatim); unrepairable ones are dropped |
-| `loaders/` | `load_entities_ch.py` (entities → ClickHouse), `set_copilot_entities.py` (facet registry), `migrate_ads_ch.py` (ad rows → a test brand), `sync_rejected_ads.py` |
+| `loaders/` | `media_hash.py` (**the** creative hash — matches the analysis service), `load_entities_ch.py` (entities → ClickHouse), `set_copilot_entities.py` (facet registry), `migrate_ads_ch.py` (ad rows → a test brand), `sync_rejected_ads.py` |
 | `brands/` | Per-brand workspaces (gitignored — data never enters the repo). `brands/example/` holds the `run.yaml`, `brand.yaml` and `focus.md` templates |
 
 ## Configuration

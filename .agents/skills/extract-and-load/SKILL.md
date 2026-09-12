@@ -114,6 +114,21 @@ The operator creates the brand. What you have to check before loading:
 The frontend's Status filter reads `meta_ads.ad_metrics_daily`, not `ad_metadata_v3`, so a test
 brand with only `ad_metadata_v3` rows shows nothing under Status.
 
+## 4c. The join key
+
+Entities find their ads through a media hash, and that hash is the analysis service's own
+content hash — phash for an image, a sha256 over sampled frame hashes for a video. It is never
+derived from the URL.
+
+If the inventory came from `ad_metadata_v3` it already carries the right hash; use it. If it
+came from somewhere with no hash — a brand whose creatives were never analysed — pass
+`--hash-from-media` and `loaders/media_hash.py` computes the same value the service would.
+
+Never substitute `md5(url)` or anything like it. It joins fine against rows written the same
+way and orphans all of them the moment the real pipeline hashes that creative. Check the shape
+if you are unsure: video hashes are 64 hex characters, image hashes are 16. A 16-hex hash on a
+video is rejected by the export.
+
 ## 5. Register the facets
 
 The UI reads the list of attributes from the brand's Mongo metrics document and nowhere else.

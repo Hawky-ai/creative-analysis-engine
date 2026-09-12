@@ -20,7 +20,7 @@ bifrost:
 extraction:
   # Image model id AS THE PROXY KNOWS IT (proxy-prefixed).
   image_model: gemini/gemini-3.8-flash
-  image_concurrency: 12
+  image_concurrency: 24
   request_timeout_ms: 120000      # per-request abort; a stalled socket otherwise hangs a slot forever
 
   # Video model id AS THE GENAI ENDPOINT KNOWS IT (bare, no proxy prefix).

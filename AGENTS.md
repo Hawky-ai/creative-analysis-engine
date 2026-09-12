@@ -178,6 +178,43 @@ Copilot's group-by / ranking paths explode array-valued attributes (copilot PR
    evidence question ("show me the line where the presenter says…"), and a
    within-language comparison. All three must succeed before handing over.
 
+## The creative hash — never invent one
+
+Entities join to ads on a media hash. That hash is derived from the CONTENT of the creative by
+the analysis service, cached in Mongo `hash_cache.hash_id` keyed by (cache_id=brand, url), and
+read from there by the CH export. It is NOT derived from the URL, the ad id, or anything that
+can be made up locally.
+
+`loaders/media_hash.py` is the ONLY place this repo hashes media. It reimplements that
+algorithm exactly:
+
+| media | algorithm | shape |
+|---|---|---|
+| image | `imagehash.phash` | 16 hex |
+| video | ~5 sampled frames → `average_hash` each → `sha256` of the concatenation | 64 hex |
+| carousel | `sha256(json.dumps(sorted(urls)))` | 64 hex |
+| video fallback | `sha256` of the first 2MB | 64 hex |
+
+The shapes are load-bearing. The export validates a video hash with `/^[a-f0-9]{64}$/` and an
+image hash with `/^[a-f0-9]{16}$/`, so a 16-hex value on a video is rejected outright and the
+row ends up with no hash at all.
+
+Three rules, everywhere — the migration, the entity load, the rejected-ads sync, and anything
+new that needs a key:
+
+- **Never write your own hash function.** `md5(url)` produces a value that joins perfectly
+  against rows written by the same mistake and orphans every one of them the day the real
+  pipeline hashes the same creative. This repo shipped that bug in three separate loaders.
+- **Prefer the hash the warehouse already has.** An inventory built from `ad_metadata_v3`
+  carries the real hash; use it. Only recompute when the source genuinely has none — a brand
+  whose creatives were never analysed has `analysis_hash`, `perceptual_hash` and `hash` empty
+  on every document and no `hash_cache` rows at all.
+- **If media cannot be hashed, write no row.** A wrong hash is worse than a missing one: the
+  missing row is visible immediately, the wrong one silently fails to join months later.
+
+`media_hash.hash_url()` returns `(hash, duration, aspect_ratio)` — it decodes the media anyway,
+so take duration and aspect ratio from it rather than trusting the source document.
+
 ## Known pitfalls (all previously hit — don't rediscover them)
 
 - Silent stalls: extraction sockets can hang forever without a timeout — both runners
